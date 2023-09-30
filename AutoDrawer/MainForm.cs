@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace AutoDrawer {
+namespace RecRoomPainter {
 
     public partial class MainForm : Form {
         public static ScalingMode scaleType = ScalingMode.Box;
@@ -532,42 +532,7 @@ namespace AutoDrawer {
 
 
         private void DrawPositionButton_Click(object sender, EventArgs e) {
-            // Set Drawing Position
-            try {
-                ProcessImage();
-                DrawPreviewForm m = new DrawPreviewForm { Opacity = 0.5 };
-                m.Show();
-                WindowState = FormWindowState.Minimized;
-                m.Location = new Point(drawLocationX, drawLocationY);
-                m.Size = new Size((int)Math.Round(imagePreview.Width * penSizeX), (int)Math.Round(imagePreview.Height * penSizeY));
-                var lastSize = m.Size;
-                var isSet = true;
-                while (isSet) {
-                    Application.DoEvents();
 
-                    m.setButton.Click += (buttonSender, buttonEventArgs) => {
-                        WindowState = FormWindowState.Normal;
-                        m.Close();
-                        isSet = false;
-                    };
-
-                    XBox.Text = Convert.ToString(m.Location.X);
-                    YBox.Text = Convert.ToString(m.Location.Y);
-
-                    if (m.Size != lastSize) {
-                        int newx = (int)Math.Round(m.Size.Width / penSizeX);
-                        int newy = (int)Math.Round(m.Size.Height / penSizeY);
-                        widthInput.Text = newx.ToString();
-                        heightInput.Text = newy.ToString();
-                        m.UpdateImage(imagePreview);
-                    }
-                    lastSize = m.Size;
-                    m.TopMost = true;
-                }
-            }
-            catch (Exception) {
-                MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Image Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            }
         }
 
 
@@ -734,6 +699,46 @@ namespace AutoDrawer {
 
         private void pixelateBar_MouseCaptureChanged(object sender, EventArgs e) {
             ProcessImage();
+        }
+
+        private void DrawPositionButton_Click_1(object sender, EventArgs e) {
+            // Set Drawing Position
+            MouseEventArgs mouse = e as MouseEventArgs;
+            try {
+                ProcessImage();
+                DrawPreviewForm m = new DrawPreviewForm(mouse) { Opacity = 0.5 };
+                m.Show();
+                WindowState = FormWindowState.Minimized;
+                m.Location = new Point(drawLocationX, drawLocationY);
+                m.Size = new Size((int)Math.Round(imagePreview.Width * penSizeX), (int)Math.Round(imagePreview.Height * penSizeY));
+                var lastSize = m.Size;
+                var isSet = true;
+                while (isSet) {
+                    Application.DoEvents();
+
+                    m.setButton.Click += (buttonSender, buttonEventArgs) => {
+                        WindowState = FormWindowState.Normal;
+                        m.Close();
+                        isSet = false;
+                    };
+
+                    XBox.Text = Convert.ToString(m.Location.X);
+                    YBox.Text = Convert.ToString(m.Location.Y);
+
+                    if (m.Size != lastSize) {
+                        int newx = (int)Math.Round(m.Size.Width / penSizeX);
+                        int newy = (int)Math.Round(m.Size.Height / penSizeY);
+                        widthInput.Text = newx.ToString();
+                        heightInput.Text = newy.ToString();
+                        m.UpdateImage(imagePreview);
+                    }
+                    lastSize = m.Size;
+                    m.TopMost = true;
+                }
+            }
+            catch (Exception) {
+                MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Image Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
         }
     }
 }
