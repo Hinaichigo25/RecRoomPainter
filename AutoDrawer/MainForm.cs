@@ -24,7 +24,7 @@ namespace AutoDrawer {
         int drawHeight = 0;
         int drawLocationX = 0;
         int drawLocationY = 0;
-        double pixelation = 2;
+        double pixelation = 1;
         int maxColors = 8;
         int skipColors = 0;
         bool fillFirstLayer = false;
@@ -651,15 +651,6 @@ namespace AutoDrawer {
             }
         }
 
-        private void imageScaleBox_TextChanged_2(object sender, EventArgs e) {
-            try {
-                pixelation = pixelateBar.Value;
-            }
-            catch (Exception) {
-                pixelation = 1;
-            }
-        }
-
         private void ditherBox_SelectedIndexChanged(object sender, EventArgs e) {
             try {
 
@@ -734,6 +725,15 @@ namespace AutoDrawer {
 
         private void label6_Click(object sender, EventArgs e) {
 
+        }
+
+        private void pixelateBar_Scroll(object sender, EventArgs e) {
+            pixelation = (double)pixelateBar.Value / 100;
+            Console.WriteLine(pixelation);
+        }
+
+        private void pixelateBar_MouseCaptureChanged(object sender, EventArgs e) {
+            ProcessImage();
         }
     }
 }
