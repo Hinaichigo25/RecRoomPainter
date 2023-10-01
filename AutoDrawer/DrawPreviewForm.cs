@@ -27,6 +27,9 @@ namespace RecRoomPainter {
         }
 
         private void buttonRD_MouseDown_1(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Left) {
+                initialMousePosition = new Point(e.X, e.Y);  // Store initial mouse position
+            }
         }
 
         private void buttonRD_MouseMove(object sender, MouseEventArgs e) {
@@ -40,9 +43,7 @@ namespace RecRoomPainter {
         }
 
         private void buttonRD_MouseUp(object sender, MouseEventArgs e) {
-            if (e.Button == MouseButtons.Left) {
-                initialMousePosition = new Point(e.X, e.Y);  // Store initial mouse position
-            }
+
         }
 
         private void RU_MouseUp(object sender, MouseEventArgs e) {

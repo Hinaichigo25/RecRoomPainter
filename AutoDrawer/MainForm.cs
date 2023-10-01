@@ -722,12 +722,12 @@ namespace RecRoomPainter {
                         isSet = false;
                     };
 
-                    XBox.Text = Convert.ToString(m.Location.X);
-                    YBox.Text = Convert.ToString(m.Location.Y);
+                    XBox.Text = Convert.ToString(m.Location.X + 20);
+                    YBox.Text = Convert.ToString(m.Location.Y + 20);
 
                     if (m.Size != lastSize) {
-                        int newx = (int)Math.Round(m.Size.Width / penSizeX);
-                        int newy = (int)Math.Round(m.Size.Height / penSizeY);
+                        int newx = (int)Math.Round(m.Size.Width / penSizeX - 40);
+                        int newy = (int)Math.Round(m.Size.Height / penSizeY - 40);
                         widthInput.Text = newx.ToString();
                         heightInput.Text = newy.ToString();
                         m.UpdateImage(imagePreview);

@@ -67,7 +67,7 @@
             this.tableLayoutPanel2.Controls.Add(this.buttonLU, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.buttonLD, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.buttonRD, 2, 2);
-            this.tableLayoutPanel2.Controls.Add(this.setButton, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.setButton, 1, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -99,9 +99,9 @@
             this.setButton.BackColor = System.Drawing.Color.Lime;
             this.setButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.setButton.Font = new System.Drawing.Font("Arial Black", 8F);
-            this.setButton.Location = new System.Drawing.Point(78, 3);
+            this.setButton.Location = new System.Drawing.Point(106, 107);
             this.setButton.Name = "setButton";
-            this.setButton.Size = new System.Drawing.Size(88, 14);
+            this.setButton.Size = new System.Drawing.Size(31, 14);
             this.setButton.TabIndex = 2;
             this.setButton.Text = "SET";
             this.setButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
