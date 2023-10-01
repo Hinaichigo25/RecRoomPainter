@@ -117,5 +117,9 @@ namespace RecRoomPainter {
                 initialMousePosition = new Point(e.X, e.Y);  // Store initial mouse position
             }
         }
+
+        private void setButton_Click(object sender, System.EventArgs e) {
+
+        }
     }
 }

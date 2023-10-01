@@ -36,6 +36,7 @@
             this.buttonLD = new System.Windows.Forms.Button();
             this.buttonRD = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.setButtonTop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -68,12 +69,14 @@
             this.tableLayoutPanel2.Controls.Add(this.buttonLD, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.buttonRD, 2, 2);
             this.tableLayoutPanel2.Controls.Add(this.setButton, 1, 2);
+            this.tableLayoutPanel2.Controls.Add(this.setButtonTop, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 3;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(244, 124);
             this.tableLayoutPanel2.TabIndex = 5;
@@ -103,9 +106,9 @@
             this.setButton.Name = "setButton";
             this.setButton.Size = new System.Drawing.Size(31, 14);
             this.setButton.TabIndex = 2;
-            this.setButton.Text = "SET";
             this.setButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.setButton.UseVisualStyleBackColor = false;
+            this.setButton.Click += new System.EventHandler(this.setButton_Click);
             // 
             // buttonLU
             // 
@@ -162,6 +165,18 @@
             this.panel1.Size = new System.Drawing.Size(244, 124);
             this.panel1.TabIndex = 0;
             // 
+            // setButtonTop
+            // 
+            this.setButtonTop.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.setButtonTop.BackColor = System.Drawing.Color.Lime;
+            this.setButtonTop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.setButtonTop.Font = new System.Drawing.Font("Arial Black", 8F);
+            this.setButtonTop.Location = new System.Drawing.Point(106, 3);
+            this.setButtonTop.Name = "setButtonTop";
+            this.setButtonTop.Size = new System.Drawing.Size(31, 14);
+            this.setButtonTop.TabIndex = 7;
+            this.setButtonTop.UseVisualStyleBackColor = false;
+            // 
             // DrawPreviewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -190,5 +205,6 @@
         private System.Windows.Forms.Button RU;
         private System.Windows.Forms.Button buttonLD;
         private System.Windows.Forms.Button buttonRD;
+        public System.Windows.Forms.Button setButtonTop;
     }
 }

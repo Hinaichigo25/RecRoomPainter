@@ -709,25 +709,34 @@ namespace RecRoomPainter {
                 DrawPreviewForm m = new DrawPreviewForm(mouse) { Opacity = 0.5 };
                 m.Show();
                 WindowState = FormWindowState.Minimized;
-                m.Location = new Point(drawLocationX, drawLocationY);
-                m.Size = new Size((int)Math.Round(imagePreview.Width * penSizeX), (int)Math.Round(imagePreview.Height * penSizeY));
+                const int locationOffset = 20;
+                const int sizeOffset = 40;
+                m.Location = new Point(drawLocationX - locationOffset, drawLocationY - locationOffset);
+                m.Size = new Size((int)Math.Round((drawWidth * penSizeX) + sizeOffset), (int)Math.Round((drawHeight * penSizeY) + sizeOffset));
                 var lastSize = m.Size;
                 var isSet = true;
                 while (isSet) {
                     Application.DoEvents();
 
-                    m.setButton.Click += (buttonSender, buttonEventArgs) => {
+                    void setPosition() {
                         WindowState = FormWindowState.Normal;
                         m.Close();
                         isSet = false;
+                    }
+
+                    m.setButton.Click += (buttonSender, buttonEventArgs) => {
+                        setPosition();
+                    };
+                    m.setButtonTop.Click += (buttonSender, buttonEventArgs) => {
+                        setPosition();
                     };
 
-                    XBox.Text = Convert.ToString(m.Location.X + 20);
-                    YBox.Text = Convert.ToString(m.Location.Y + 20);
+                    XBox.Text = Convert.ToString(m.Location.X + locationOffset);
+                    YBox.Text = Convert.ToString(m.Location.Y + locationOffset);
 
                     if (m.Size != lastSize) {
-                        int newx = (int)Math.Round(m.Size.Width / penSizeX - 40);
-                        int newy = (int)Math.Round(m.Size.Height / penSizeY - 40);
+                        int newx = (int)Math.Round(m.Size.Width / penSizeX - sizeOffset);
+                        int newy = (int)Math.Round(m.Size.Height / penSizeY - sizeOffset);
                         widthInput.Text = newx.ToString();
                         heightInput.Text = newy.ToString();
                         m.UpdateImage(imagePreview);
