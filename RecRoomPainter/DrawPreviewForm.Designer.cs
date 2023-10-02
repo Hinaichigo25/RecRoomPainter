@@ -31,12 +31,12 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.RU = new System.Windows.Forms.Button();
-            this.setButton = new System.Windows.Forms.Button();
             this.buttonLU = new System.Windows.Forms.Button();
             this.buttonLD = new System.Windows.Forms.Button();
             this.buttonRD = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.setButton = new System.Windows.Forms.Button();
             this.setButtonTop = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -64,12 +64,12 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.Controls.Add(this.RU, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this.pictureBox1, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.buttonLU, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.buttonLD, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.buttonRD, 2, 2);
             this.tableLayoutPanel2.Controls.Add(this.setButton, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.setButtonTop, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.pictureBox1, 1, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -95,20 +95,6 @@
             this.RU.UseVisualStyleBackColor = false;
             this.RU.MouseDown += new System.Windows.Forms.MouseEventHandler(this.RU_MouseDown);
             this.RU.MouseMove += new System.Windows.Forms.MouseEventHandler(this.RU_MouseMove);
-            // 
-            // setButton
-            // 
-            this.setButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.setButton.BackColor = System.Drawing.Color.Lime;
-            this.setButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.setButton.Font = new System.Drawing.Font("Arial Black", 8F);
-            this.setButton.Location = new System.Drawing.Point(106, 107);
-            this.setButton.Name = "setButton";
-            this.setButton.Size = new System.Drawing.Size(31, 14);
-            this.setButton.TabIndex = 2;
-            this.setButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.setButton.UseVisualStyleBackColor = false;
-            this.setButton.Click += new System.EventHandler(this.setButton_Click);
             // 
             // buttonLU
             // 
@@ -154,16 +140,19 @@
             this.buttonRD.MouseDown += new System.Windows.Forms.MouseEventHandler(this.buttonRD_MouseDown_1);
             this.buttonRD.MouseMove += new System.Windows.Forms.MouseEventHandler(this.buttonRD_MouseMove);
             // 
-            // panel1
+            // setButton
             // 
-            this.panel1.AutoSize = true;
-            this.panel1.Controls.Add(this.tableLayoutPanel2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(244, 124);
-            this.panel1.TabIndex = 0;
+            this.setButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.setButton.BackColor = System.Drawing.Color.Lime;
+            this.setButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.setButton.Font = new System.Drawing.Font("Arial Black", 8F);
+            this.setButton.Location = new System.Drawing.Point(106, 107);
+            this.setButton.Name = "setButton";
+            this.setButton.Size = new System.Drawing.Size(31, 14);
+            this.setButton.TabIndex = 2;
+            this.setButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.setButton.UseVisualStyleBackColor = false;
+            this.setButton.Click += new System.EventHandler(this.setButton_Click);
             // 
             // setButtonTop
             // 
@@ -176,6 +165,17 @@
             this.setButtonTop.Size = new System.Drawing.Size(31, 14);
             this.setButtonTop.TabIndex = 7;
             this.setButtonTop.UseVisualStyleBackColor = false;
+            // 
+            // panel1
+            // 
+            this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.tableLayoutPanel2);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(244, 124);
+            this.panel1.TabIndex = 0;
             // 
             // DrawPreviewForm
             // 

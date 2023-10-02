@@ -17,21 +17,62 @@ namespace RecRoomPainter {
         const int MOUSEDELAY = 40;
         const int COLORCHANGEDELAY = 2000;
 
+        public class UserSettingVars {
+            public int DrawW {
+                get; set;
+            }
+            public int DrawH {
+                get; set;
+            }
+            public int DrawX {
+                get; set;
+            }
+            public int DrawY {
+                get; set;
+            }
+            public double Pixelation {
+                get; set;
+            }
+            public int MaxColors {
+                get; set;
+            }
+            public int SkipColors {
+                get; set;
+            }
+            public bool FillFirstLayer {
+                get; set;
+            }
+            public int DitherPattern {
+                get; set;
+            }
+            public float PenSizeX {
+                get; set;
+            }
+            public float PenSizeY {
+                get; set;
+            }
+        }
+
+        UserSettingVars UserSettings = new UserSettingVars {
+            DrawW = 0,
+            DrawH = 0,
+            DrawX = 0,
+            DrawY = 0,
+            Pixelation = 1,
+            MaxColors = 16,
+            SkipColors = 0,
+            FillFirstLayer = false,
+            DitherPattern = 0,
+            PenSizeX = 1,
+            PenSizeY = 1,
+        };
+
+
         Bitmap imageFile;
         Bitmap image;
         public static Bitmap imagePreview;
-        int drawWidth = 0;
-        int drawHeight = 0;
-        int drawLocationX = 0;
-        int drawLocationY = 0;
-        double pixelation = 1;
-        int maxColors = 8;
-        int skipColors = 0;
-        bool fillFirstLayer = false;
+
         bool scanDirection = false;
-        int ditherPattern = 0;
-        float penSizeX = 1;
-        float penSizeY = 1;
         long estimatedTime = 0;
 
 
@@ -101,13 +142,13 @@ namespace RecRoomPainter {
                 EnableControls(false);
                 progressBar1.Value = 0;
                 image = imageFile;
-                image = ResizeImage(imageFile, new Size(drawWidth, drawHeight), pixelation);
+                image = ResizeImage(imageFile, new Size(UserSettings.DrawW, UserSettings.DrawH), UserSettings.Pixelation);
                 progressBar1.Value = 10;
 
                 IDitherer dither = OrderedDitherer.Bayer2x2;
 
-                IQuantizer quantizer = OptimizedPaletteQuantizer.Wu(maxColors);
-                switch (ditherPattern) {
+                IQuantizer quantizer = OptimizedPaletteQuantizer.Wu(UserSettings.MaxColors);
+                switch (UserSettings.DitherPattern) {
                     case 1:
                         dither = OrderedDitherer.Bayer2x2;
                         break;
@@ -154,7 +195,7 @@ namespace RecRoomPainter {
                         dither = ErrorDiffusionDitherer.Stucki;
                         break;
                 }
-                if (ditherPattern > 0) {
+                if (UserSettings.DitherPattern > 0) {
                     BitmapExtensions.Dither(image, quantizer, dither);
                 }
                 else {
@@ -162,10 +203,9 @@ namespace RecRoomPainter {
                 }
                 progressBar1.Value = 50;
 
-                image = BitmapExtensions.Resize(image, new Size(drawWidth, drawHeight), ScalingMode.NearestNeighbor);
+                image = BitmapExtensions.Resize(image, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSizeX), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSizeY)), ScalingMode.NearestNeighbor);
 
-                pictureBox1.Image = BitmapExtensions.Resize(image, new Size(1920, 1080), scaleType, true);
-                imagePreview = image;
+                SetPreview();
 
                 progressBar1.Value = 100;
                 EnableControls(true);
@@ -339,7 +379,7 @@ namespace RecRoomPainter {
                     else {
                         DrawLine(addXValues[max], addYValues[max], dirCount[max]);
                     }
-                    MoveMouse(drawLocationX + (int)Math.Round(x * penSizeX), drawLocationY + (int)Math.Round(y * penSizeY), speed, est);
+                    MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
                 }
             }
             return didItDraw;
@@ -400,8 +440,8 @@ namespace RecRoomPainter {
 
 
         void DrawPixel(bool[,] matrix, int px, int py, bool est) {
-            int xpos = drawLocationX + (int)Math.Round(px * penSizeX);
-            int ypos = drawLocationY + (int)Math.Round(py * penSizeY);
+            int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
+            int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
 
             LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
 
@@ -429,11 +469,11 @@ namespace RecRoomPainter {
             for (int c = 0; c < pallet.Length; c++) {
                 float progress = (float)(c / (float)pallet.Length) * 100;
                 progressBar1.Value = (int)progress;
-                if (c < skipColors || pallet[c] == Color.FromArgb(255, 255, 255)) {
+                if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 255)) {
                     continue;
                 }
                 bool[,] sMatrix = new bool[image.Width, image.Height];
-                if (fillFirstLayer && c == 0) {
+                if (UserSettings.FillFirstLayer && c == 0) {
                     for (int i = 0; i < sMatrix.GetLength(0); i++) {
                         for (int j = 0; j < sMatrix.GetLength(1); j++) {
                             sMatrix[i, j] = true;
@@ -497,10 +537,10 @@ namespace RecRoomPainter {
             // picture that the user chose.
             if (openFileDialog1.ShowDialog() == DialogResult.OK) {
                 imageFile = new Bitmap(openFileDialog1.FileName);
-                drawWidth = imageFile.Width;
-                drawHeight = imageFile.Height;
-                widthInput.Text = drawWidth.ToString();
-                heightInput.Text = drawHeight.ToString();
+                UserSettings.DrawW = imageFile.Width;
+                UserSettings.DrawH = imageFile.Height;
+                widthInput.Text = UserSettings.DrawW.ToString();
+                heightInput.Text = UserSettings.DrawH.ToString();
                 image = imageFile;
                 ProcessImage();
                 pictureBox1.Image = BitmapExtensions.Resize(image, new Size(1920, 1080), scaleType, true);
@@ -522,11 +562,11 @@ namespace RecRoomPainter {
         private void WidthInput_TextChanged(object sender, EventArgs e) {
             // Change in width of image
             try {
-                drawWidth = Convert.ToInt32(widthInput.Text);
-                drawWidth = int.Parse(widthInput.Text);
+                UserSettings.DrawW = Convert.ToInt32(widthInput.Text);
+                UserSettings.DrawW = int.Parse(widthInput.Text);
             }
             catch (Exception) {
-                drawWidth = image.Width;
+                UserSettings.DrawW = image.Width;
             }
         }
 
@@ -551,84 +591,86 @@ namespace RecRoomPainter {
         private void HeightInput_TextChanged(object sender, EventArgs e) {
             // Change in height of image
             try {
-                drawHeight =
-
-
-                    Convert.ToInt32(heightInput.Text);
-                drawHeight = int.Parse(heightInput.Text);
+                UserSettings.DrawH = Convert.ToInt32(heightInput.Text);
+                UserSettings.DrawH = int.Parse(heightInput.Text);
             }
             catch (Exception) {
-                drawHeight = image.Height;
+                UserSettings.DrawH = image.Height;
             }
         }
 
         private void XBox_TextChanged(object sender, EventArgs e) {
             // Delay interval between the drawing of each pixel
             try {
-                drawLocationX = Convert.ToInt32(XBox.Text);
-                drawLocationX = int.Parse(XBox.Text);
+                UserSettings.DrawX = Convert.ToInt32(XBox.Text);
+                UserSettings.DrawX = int.Parse(XBox.Text);
             }
             catch (Exception) {
-                drawLocationX = 0;
+                UserSettings.DrawX = 0;
             }
         }
 
         private void YBox_TextChanged(object sender, EventArgs e) {
             // Delay interval between the drawing of each pixel
             try {
-                drawLocationY = Convert.ToInt32(YBox.Text);
-                drawLocationY = int.Parse(YBox.Text);
+                UserSettings.DrawY = Convert.ToInt32(YBox.Text);
+                UserSettings.DrawY = int.Parse(YBox.Text);
             }
             catch (Exception) {
-                drawLocationY = 0;
+                UserSettings.DrawY = 0;
             }
         }
 
 
         private void maxColorsBox_TextChanged(object sender, EventArgs e) {
             try {
-                maxColors = Convert.ToInt32(maxColorsBox.Text);
-                maxColors = int.Parse(maxColorsBox.Text);
+                UserSettings.MaxColors = Convert.ToInt32(maxColorsBox.Text);
+                UserSettings.MaxColors = int.Parse(maxColorsBox.Text);
             }
             catch (Exception) {
-                maxColors = 1;
+                UserSettings.MaxColors = 1;
             }
         }
 
 
         private void skipColorBox_TextChanged(object sender, EventArgs e) {
             try {
-                skipColors = Convert.ToInt32(skipColorBox.Text);
-                skipColors = int.Parse(skipColorBox.Text);
+                UserSettings.SkipColors = Convert.ToInt32(skipColorBox.Text);
+                UserSettings.SkipColors = int.Parse(skipColorBox.Text);
             }
             catch (Exception) {
-                skipColors = 0;
+                UserSettings.SkipColors = 0;
             }
         }
 
 
         private void firstLayerFill_CheckedChanged(object sender, EventArgs e) {
             try {
-                fillFirstLayer = firstLayerFill.Checked;
+                UserSettings.FillFirstLayer = firstLayerFill.Checked;
             }
             catch (Exception) {
-                fillFirstLayer = true;
+                UserSettings.FillFirstLayer = true;
             }
         }
 
         private void ditherBox_SelectedIndexChanged(object sender, EventArgs e) {
             try {
 
-                ditherPattern = ditherBox.SelectedIndex;
+                UserSettings.DitherPattern = ditherBox.SelectedIndex;
                 ProcessImage();
             }
             catch (Exception) {
-                ditherPattern = 0;
+                UserSettings.DitherPattern = 0;
             }
         }
 
         private void OpenFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
 
+        }
+
+        public void SetPreview() {
+            imagePreview = (Bitmap)image.Clone();
+            pictureBox1.Image = BitmapExtensions.Resize(imagePreview, new Size((int)Math.Round(imagePreview.Width * UserSettings.PenSizeX), (int)Math.Round(imagePreview.Height * UserSettings.PenSizeY)), scaleType, true);
         }
 
         private void estButton_Click(object sender, EventArgs e) {
@@ -652,35 +694,30 @@ namespace RecRoomPainter {
 
         private void widthInput_Leave(object sender, EventArgs e) {
             ProcessImage();
-            pictureBox1.Image = BitmapExtensions.Resize(image, new Size(1920, 1080), scaleType, true);
-            imagePreview = image;
-
 
         }
 
         private void heightInput_Leave(object sender, EventArgs e) {
             ProcessImage();
-            pictureBox1.Image = BitmapExtensions.Resize(image, new Size(1920, 1080), scaleType, true);
-            imagePreview = image;
         }
 
         private void GapYBox_Leave(object sender, EventArgs e) {
             try {
-                penSizeY = (float)Convert.ToDouble(GapYBox.Text) + 1;
-                penSizeY = float.Parse(GapYBox.Text) + 1;
+                UserSettings.PenSizeY = (float)Convert.ToDouble(GapYBox.Text) + 1;
+                UserSettings.PenSizeY = float.Parse(GapYBox.Text) + 1;
             }
             catch (Exception) {
-                penSizeY = 1;
+                UserSettings.PenSizeY = 1;
             }
         }
 
         private void GapXBox_Leave(object sender, EventArgs e) {
             try {
-                penSizeX = (float)Convert.ToDouble(GapXBox.Text) + 1;
-                penSizeX = float.Parse(GapXBox.Text) + 1;
+                UserSettings.PenSizeX = (float)Convert.ToDouble(GapXBox.Text) + 1;
+                UserSettings.PenSizeX = float.Parse(GapXBox.Text) + 1;
             }
             catch (Exception) {
-                penSizeX = 1;
+                UserSettings.PenSizeX = 1;
             }
         }
 
@@ -693,8 +730,8 @@ namespace RecRoomPainter {
         }
 
         private void pixelateBar_Scroll(object sender, EventArgs e) {
-            pixelation = (double)pixelateBar.Value / 100;
-            Console.WriteLine(pixelation);
+            UserSettings.Pixelation = (double)pixelateBar.Value / 100;
+            Console.WriteLine(UserSettings.Pixelation);
         }
 
         private void pixelateBar_MouseCaptureChanged(object sender, EventArgs e) {
@@ -711,8 +748,8 @@ namespace RecRoomPainter {
                 WindowState = FormWindowState.Minimized;
                 const int locationOffset = 20;
                 const int sizeOffset = 40;
-                m.Location = new Point(drawLocationX - locationOffset, drawLocationY - locationOffset);
-                m.Size = new Size((int)Math.Round((drawWidth * penSizeX) + sizeOffset), (int)Math.Round((drawHeight * penSizeY) + sizeOffset));
+                m.Size = new Size(UserSettings.DrawW + sizeOffset, UserSettings.DrawH + sizeOffset);
+                m.Location = new Point(UserSettings.DrawX - locationOffset, UserSettings.DrawY - locationOffset);
                 var lastSize = m.Size;
                 var isSet = true;
                 while (isSet) {
@@ -735,8 +772,8 @@ namespace RecRoomPainter {
                     YBox.Text = Convert.ToString(m.Location.Y + locationOffset);
 
                     if (m.Size != lastSize) {
-                        int newx = (int)Math.Round(m.Size.Width / penSizeX - sizeOffset);
-                        int newy = (int)Math.Round(m.Size.Height / penSizeY - sizeOffset);
+                        int newx = m.Size.Width - sizeOffset;
+                        int newy = m.Size.Height - sizeOffset;
                         widthInput.Text = newx.ToString();
                         heightInput.Text = newy.ToString();
                         m.UpdateImage(imagePreview);
