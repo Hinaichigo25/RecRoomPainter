@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecRoomPainter", "RecRoomPainter\RecRoomPainter.csproj", "{77710A9C-6AAD-496B-8C07-A5892FD1E995}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecRoomPainter", "AutoDrawer\RecRoomPainter.csproj", "{77710A9C-6AAD-496B-8C07-A5892FD1E995}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
