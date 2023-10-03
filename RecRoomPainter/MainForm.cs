@@ -292,12 +292,12 @@ namespace RecRoomPainter {
             return maxIndex;
         }
 
-        bool[,] CoverageMatrix(Bitmap img, Color color) {
-            bool[,] matrix = new bool[img.Width, img.Height];
+        int[,] CoverageMatrix(Bitmap img, Color color) {
+            int[,] matrix = new int[img.Width, img.Height];
             for (int i = 0; i < img.Width; i++) {
                 for (int j = 0; j < img.Height; j++) {
                     if (img.GetPixel(i, j) == color) {
-                        matrix[i, j] = true;
+                        matrix[i, j] = 1;
                     }
                 }
             }
@@ -315,13 +315,13 @@ namespace RecRoomPainter {
         }
 
 
-        bool NeighborLineDraw(bool[,] matrix, int x, int y, bool est) {
+        bool NeighborLineDraw(int[,] matrix, int x, int y, bool est) {
 
             bool didItDraw = false;
 
             bool CheckNeighbor(int relx, int rely) {
                 if (relx >= 0 && rely >= 0 && relx < matrix.GetLength(0) && rely < matrix.GetLength(1)) {
-                    if (matrix[relx, rely]) {
+                    if (matrix[relx, rely] >= 1) {
                         x = relx;
                         y = rely;
                         return true;
@@ -331,12 +331,12 @@ namespace RecRoomPainter {
             }
             void DrawLine(int dirX, int dirY, int steps) {
                 didItDraw = true;
-                matrix[x, y] = false;
+                matrix[x, y] = 0;
                 for (int i = 0; i < steps; i++) {
                     if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.GetLength(0) && y + dirY < matrix.GetLength(1)) {
                         x += dirX;
                         y += dirY;
-                        matrix[x, y] = false;
+                        matrix[x, y] = 0;
                     }
                 }
             }
@@ -439,7 +439,7 @@ namespace RecRoomPainter {
         }
 
 
-        void DrawPixel(bool[,] matrix, int px, int py, bool est) {
+        void DrawPixel(int[,] matrix, int px, int py, bool est) {
             int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
             int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
 
@@ -472,18 +472,18 @@ namespace RecRoomPainter {
                 if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 255)) {
                     continue;
                 }
-                bool[,] sMatrix = new bool[image.Width, image.Height];
+                int[,] sMatrix = new int[image.Width, image.Height];
                 if (UserSettings.FillFirstLayer && c == 0) {
                     for (int i = 0; i < sMatrix.GetLength(0); i++) {
                         for (int j = 0; j < sMatrix.GetLength(1); j++) {
-                            sMatrix[i, j] = true;
+                            sMatrix[i, j] = 1;
                         }
                     }
                 }
                 else {
                     sMatrix = CoverageMatrix(image, pallet[c]);
                 }
-                bool[,] cMatrix = new bool[image.Width, image.Height];
+                int[,] cMatrix = new int[image.Width, image.Height];
                 Array.Copy(sMatrix, cMatrix, sMatrix.Length);
 
                 if (!est) {
@@ -500,7 +500,7 @@ namespace RecRoomPainter {
                         if (ModifierKeys == Keys.Alt)
                             return false;
                     }
-                    if (cMatrix[i, j]) {
+                    if (cMatrix[i, j] >= 1) {
                         DrawPixel(cMatrix, i, j, est);
                     }
                     if (!scanDirection) {
