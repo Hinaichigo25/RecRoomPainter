@@ -196,15 +196,14 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         public System.Windows.Forms.Button setButton;
-        private System.Windows.Forms.Button buttonLU;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button RU;
-        private System.Windows.Forms.Button buttonLD;
-        private System.Windows.Forms.Button buttonRD;
         public System.Windows.Forms.Button setButtonTop;
+        public System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.Button buttonLU;
+        public System.Windows.Forms.Button RU;
+        public System.Windows.Forms.Button buttonLD;
+        public System.Windows.Forms.Button buttonRD;
     }
 }

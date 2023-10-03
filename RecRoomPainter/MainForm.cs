@@ -776,6 +776,7 @@ namespace RecRoomPainter {
                         int newy = m.Size.Height - sizeOffset;
                         widthInput.Text = newx.ToString();
                         heightInput.Text = newy.ToString();
+                        ProcessImage();
                         m.UpdateImage(imagePreview);
                     }
                     lastSize = m.Size;
