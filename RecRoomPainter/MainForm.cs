@@ -1,4 +1,5 @@
-﻿using KGySoft.Drawing;
+﻿using KGySoft.CoreLibraries;
+using KGySoft.Drawing;
 using KGySoft.Drawing.Imaging;
 using System;
 using System.Collections.Generic;
@@ -134,6 +135,11 @@ namespace RecRoomPainter {
             YBox.Enabled = enable;
             GapXBox.Enabled = enable;
             GapYBox.Enabled = enable;
+            CropButton.Enabled = enable;
+            CropHBox.Enabled = enable;
+            CropWBox.Enabled = enable;
+            CropXBox.Enabled = enable;
+            CropYBox.Enabled = enable;
         }
 
 
@@ -292,14 +298,21 @@ namespace RecRoomPainter {
             return maxIndex;
         }
 
-        int[,] CoverageMatrix(Bitmap img, Color color) {
-            int[,] matrix = new int[img.Width, img.Height];
+        List<List<int>> CoverageMatrix(Bitmap img, Color color) {
+            List<List<int>> matrix = new List<List<int>>(img.Width);
+
+            // Initialize the 2D list with rows and columns filled with 0
             for (int i = 0; i < img.Width; i++) {
+                List<int> row = new List<int>(img.Height);
                 for (int j = 0; j < img.Height; j++) {
                     if (img.GetPixel(i, j) == color) {
-                        matrix[i, j] = 1;
+                        row.Add(1);
+                    }
+                    else {
+                        row.Add(0);
                     }
                 }
+                matrix.Add(row);
             }
             return matrix;
         }
@@ -309,34 +322,32 @@ namespace RecRoomPainter {
                 SetCursorPos(x, y);
                 Thread.Sleep(delay);
             }
-            else {
-                estimatedTime += delay;
-            }
+            estimatedTime += delay;
         }
 
 
-        bool NeighborLineDraw(int[,] matrix, int x, int y, bool est) {
+        int NeighborLineDraw(List<List<int>> matrix, int x, int y, int changes, bool est) {
 
-            bool didItDraw = false;
-
-            bool CheckNeighbor(int relx, int rely) {
-                if (relx >= 0 && rely >= 0 && relx < matrix.GetLength(0) && rely < matrix.GetLength(1)) {
-                    if (matrix[relx, rely] >= 1) {
+            int CheckNeighbor(int cx, int cy, int count) {
+                int relx = x + cx;
+                int rely = y + cy;
+                if (relx >= 0 && rely >= 0 && relx < matrix.Count && rely < matrix[0].Count) {
+                    if (matrix[relx][rely] > 0) {
                         x = relx;
                         y = rely;
-                        return true;
+                        return CheckNeighbor(cx, cy, count + 1);
                     }
                 }
-                return false;
+                return count;
             }
             void DrawLine(int dirX, int dirY, int steps) {
-                didItDraw = true;
-                matrix[x, y] = 0;
+                changes += steps;
+                matrix[x][y] = 0;
                 for (int i = 0; i < steps; i++) {
-                    if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.GetLength(0) && y + dirY < matrix.GetLength(1)) {
+                    if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.Count && y + dirY < matrix[0].Count) {
                         x += dirX;
                         y += dirY;
-                        matrix[x, y] = 0;
+                        matrix[x][y] = 0;
                     }
                 }
             }
@@ -356,9 +367,7 @@ namespace RecRoomPainter {
 
 
                 for (int i = 0; i < dirCount.Length; i++) {
-                    while (CheckNeighbor(x + addXValues[i], y + addYValues[i])) {
-                        dirCount[i]++;
-                    }
+                    dirCount[i] = CheckNeighbor(addXValues[i], addYValues[i], 0);
                     x -= addXValues[i] * dirCount[i];
                     y -= addYValues[i] * dirCount[i];
                 }
@@ -382,7 +391,7 @@ namespace RecRoomPainter {
                     MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
                 }
             }
-            return didItDraw;
+            return changes;
         }
 
         Color[] ImageToPallet(Bitmap img) {
@@ -420,9 +429,7 @@ namespace RecRoomPainter {
                 mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
                 System.Threading.Thread.Sleep(delay);
             }
-            else {
-                estimatedTime += delay;
-            }
+            estimatedTime += delay;
 
         }
 
@@ -432,27 +439,64 @@ namespace RecRoomPainter {
                 mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
                 System.Threading.Thread.Sleep(delay);
             }
-            else {
-                estimatedTime += delay;
-            }
+            estimatedTime += delay;
 
         }
 
 
-        void DrawPixel(int[,] matrix, int px, int py, bool est) {
+        int DrawPixel(List<List<int>> matrix, int px, int py, bool est) {
             int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
             int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
 
             LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
-
-            if (!NeighborLineDraw(matrix, px, py, est)) {
+            int changes = NeighborLineDraw(matrix, px, py, 0, est);
+            if (changes == 0) {
+                matrix[px][py] = 0;
                 for (int i = 0; i < 6; i++) {
                     LeftMouseDown(xpos, ypos, MOUSEDELAY / 2, est);
                     LeftMouseUp(xpos, ypos, 2, est);
                 }
+                changes = 1;
             }
             LeftMouseUp(xpos, ypos, MOUSEDELAY / 2, est);
+            return changes;
+        }
 
+        void CountEdgesMatrix(List<List<int>> matrix) {
+
+            for (int i = 0; i < matrix.Count; i++) {
+                for (int j = 0; j < matrix[i].Count; j++) {
+                    if (matrix[i][j] > 0) {
+                        if (i + 1 < matrix.Count) {
+
+                            if (matrix[i + 1][j] == 0)
+                                matrix[i][j]++;
+                        }
+                        else
+                            matrix[i][j]++;
+                        if (j + 1 < matrix.Count) {
+                            if (matrix[i][j + 1] == 0)
+                                matrix[i][j]++;
+                        }
+                        else
+                            matrix[i][j]++;
+                        if (i - 1 >= 0) {
+
+                            if (matrix[i - 1][j] == 0)
+                                matrix[i][j]++;
+                        }
+                        else
+                            matrix[i][j]++;
+                        if (j - 1 >= 0) {
+
+                            if (matrix[i][j - 1] == 0)
+                                matrix[i][j]++;
+                        }
+                        else
+                            matrix[i][j]++;
+                    }
+                }
+            }
         }
 
         private bool Draw(bool est) {
@@ -460,9 +504,7 @@ namespace RecRoomPainter {
                 ActivateWindow("Rec Room");
                 Thread.Sleep(1000);
             }
-            else {
-                estimatedTime += 1000;
-            }
+            estimatedTime += 1000;
 
             Color[] pallet = ImageToPallet(image);
 
@@ -472,54 +514,37 @@ namespace RecRoomPainter {
                 if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 255)) {
                     continue;
                 }
-                int[,] sMatrix = new int[image.Width, image.Height];
+
+                List<List<int>> cMatrix = new List<List<int>>(image.Width);
                 if (UserSettings.FillFirstLayer && c == 0) {
-                    for (int i = 0; i < sMatrix.GetLength(0); i++) {
-                        for (int j = 0; j < sMatrix.GetLength(1); j++) {
-                            sMatrix[i, j] = 1;
+                    // Initialize the 2D list with rows and columns filled with 0
+                    for (int i = 0; i < image.Width; i++) {
+                        List<int> row = new List<int>(image.Height);
+                        for (int j = 0; j < image.Height; j++) {
+                            row.Add(1);
                         }
+                        cMatrix.Add(row);
                     }
                 }
                 else {
-                    sMatrix = CoverageMatrix(image, pallet[c]);
+                    cMatrix = CoverageMatrix(image, pallet[c]);
                 }
-                int[,] cMatrix = new int[image.Width, image.Height];
-                Array.Copy(sMatrix, cMatrix, sMatrix.Length);
 
                 if (!est) {
                     SetPenColor($"{pallet[c].R:X2}{pallet[c].G:X2}{pallet[c].B:X2}");
                 }
-                else {
-                    estimatedTime += COLORCHANGEDELAY * 5;
-                }
-                int iResetNumber = 0;
-                int jResetNumber = 0;
-                for (int j = jResetNumber, i = iResetNumber; j < cMatrix.GetLength(1) && i < cMatrix.GetLength(0);) {
-                    if (!est) {
-                        Application.DoEvents();
-                        if (ModifierKeys == Keys.Alt)
-                            return false;
-                    }
-                    if (cMatrix[i, j] >= 1) {
-                        DrawPixel(cMatrix, i, j, est);
-                    }
-                    if (!scanDirection) {
-                        i++;
-                        if (i >= cMatrix.GetLength(0)) {
-                            jResetNumber++;
-                            i = iResetNumber;
-                            j = jResetNumber;
-                            scanDirection = !scanDirection;
+                estimatedTime += COLORCHANGEDELAY * 5;
+                for (int i2 = 0; i2 < cMatrix.Count; i2++) {
+                    for (int j2 = 0; j2 < cMatrix[i2].Count; j2++) {
+                        if (!est) {
+                            Application.DoEvents();
+                            if (ModifierKeys == Keys.Alt)
+                                return false;
                         }
-                    }
-                    else {
-                        j++;
-                        if (j >= cMatrix.GetLength(1)) {
-                            iResetNumber++;
-                            i = iResetNumber;
-                            j = jResetNumber;
-                            scanDirection = !scanDirection;
+                        if (cMatrix[i2][j2] >= 1) {
+                            DrawPixel(cMatrix, i2, j2, est);
                         }
+
                     }
                 }
                 if (!est) {
@@ -786,6 +811,10 @@ namespace RecRoomPainter {
             catch (Exception) {
                 MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Image Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
+        }
+
+        private void CropButton_Click(object sender, EventArgs e) {
+
         }
     }
 }
