@@ -68,11 +68,25 @@
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel10 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel11 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel12 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel13 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel14 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel15 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel22 = new System.Windows.Forms.TableLayoutPanel();
+            this.CropButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel23 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel24 = new System.Windows.Forms.TableLayoutPanel();
+            this.CropYlabel = new System.Windows.Forms.Label();
+            this.CropYBox = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel25 = new System.Windows.Forms.TableLayoutPanel();
+            this.CropXlabel = new System.Windows.Forms.Label();
+            this.CropXBox = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel26 = new System.Windows.Forms.TableLayoutPanel();
+            this.CropWBox = new System.Windows.Forms.TextBox();
+            this.CropWlabel = new System.Windows.Forms.Label();
+            this.tableLayoutPanel27 = new System.Windows.Forms.TableLayoutPanel();
+            this.CropHlabel = new System.Windows.Forms.Label();
+            this.CropHBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel21 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel20 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel17 = new System.Windows.Forms.TableLayoutPanel();
@@ -80,22 +94,8 @@
             this.tableLayoutPanel19 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.maxColorsBox = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel11 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel16 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel22 = new System.Windows.Forms.TableLayoutPanel();
-            this.CropButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel23 = new System.Windows.Forms.TableLayoutPanel();
-            this.CropHBox = new System.Windows.Forms.TextBox();
-            this.tableLayoutPanel24 = new System.Windows.Forms.TableLayoutPanel();
-            this.CropHlabel = new System.Windows.Forms.Label();
-            this.tableLayoutPanel25 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel26 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel27 = new System.Windows.Forms.TableLayoutPanel();
-            this.CropWBox = new System.Windows.Forms.TextBox();
-            this.CropXBox = new System.Windows.Forms.TextBox();
-            this.CropYBox = new System.Windows.Forms.TextBox();
-            this.CropWlabel = new System.Windows.Forms.Label();
-            this.CropXlabel = new System.Windows.Forms.Label();
-            this.CropYlabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pixelateBar)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
@@ -108,23 +108,23 @@
             this.tableLayoutPanel9.SuspendLayout();
             this.tableLayoutPanel10.SuspendLayout();
             this.tableLayoutPanel8.SuspendLayout();
-            this.tableLayoutPanel11.SuspendLayout();
             this.tableLayoutPanel12.SuspendLayout();
             this.tableLayoutPanel13.SuspendLayout();
             this.tableLayoutPanel14.SuspendLayout();
             this.tableLayoutPanel15.SuspendLayout();
-            this.tableLayoutPanel21.SuspendLayout();
-            this.tableLayoutPanel20.SuspendLayout();
-            this.tableLayoutPanel17.SuspendLayout();
-            this.tableLayoutPanel18.SuspendLayout();
-            this.tableLayoutPanel19.SuspendLayout();
-            this.tableLayoutPanel16.SuspendLayout();
             this.tableLayoutPanel22.SuspendLayout();
             this.tableLayoutPanel23.SuspendLayout();
             this.tableLayoutPanel24.SuspendLayout();
             this.tableLayoutPanel25.SuspendLayout();
             this.tableLayoutPanel26.SuspendLayout();
             this.tableLayoutPanel27.SuspendLayout();
+            this.tableLayoutPanel21.SuspendLayout();
+            this.tableLayoutPanel20.SuspendLayout();
+            this.tableLayoutPanel17.SuspendLayout();
+            this.tableLayoutPanel18.SuspendLayout();
+            this.tableLayoutPanel19.SuspendLayout();
+            this.tableLayoutPanel11.SuspendLayout();
+            this.tableLayoutPanel16.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -150,7 +150,7 @@
             // 
             // XBox
             // 
-            this.XBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.XBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.XBox.Enabled = false;
             this.XBox.Location = new System.Drawing.Point(2, 2);
             this.XBox.Margin = new System.Windows.Forms.Padding(2);
@@ -160,11 +160,11 @@
             this.XBox.TabIndex = 13;
             this.XBox.Text = "0";
             this.XBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.XBox.TextChanged += new System.EventHandler(this.XBox_TextChanged);
+            this.XBox.Leave += new System.EventHandler(this.XBox_Leave);
             // 
             // YBox
             // 
-            this.YBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.YBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.YBox.Enabled = false;
             this.YBox.Location = new System.Drawing.Point(2, 2);
             this.YBox.Margin = new System.Windows.Forms.Padding(2);
@@ -174,31 +174,33 @@
             this.YBox.TabIndex = 14;
             this.YBox.Text = "0";
             this.YBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.YBox.TextChanged += new System.EventHandler(this.YBox_TextChanged);
+            this.YBox.Leave += new System.EventHandler(this.YBox_Leave);
             // 
             // YText
             // 
-            this.YText.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.YText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.YText.AutoSize = true;
             this.YText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            this.YText.Location = new System.Drawing.Point(82, 3);
+            this.YText.Location = new System.Drawing.Point(80, 3);
             this.YText.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.YText.Name = "YText";
-            this.YText.Size = new System.Drawing.Size(16, 16);
+            this.YText.Size = new System.Drawing.Size(21, 16);
             this.YText.TabIndex = 15;
             this.YText.Text = "Y";
+            this.YText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // XText
             // 
-            this.XText.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.XText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.XText.AutoSize = true;
             this.XText.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            this.XText.Location = new System.Drawing.Point(83, 3);
+            this.XText.Location = new System.Drawing.Point(80, 3);
             this.XText.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.XText.Name = "XText";
-            this.XText.Size = new System.Drawing.Size(15, 16);
+            this.XText.Size = new System.Drawing.Size(21, 16);
             this.XText.TabIndex = 16;
             this.XText.Text = "X";
+            this.XText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DrawPositionButton
             // 
@@ -264,7 +266,7 @@
             this.skipColorBox.TabIndex = 15;
             this.skipColorBox.Text = "0";
             this.skipColorBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.skipColorBox.TextChanged += new System.EventHandler(this.skipColorBox_TextChanged);
+            this.skipColorBox.Leave += new System.EventHandler(this.skipColorBox_Leave);
             // 
             // ditherBox
             // 
@@ -288,7 +290,7 @@
             "SierraLite",
             "StevensonArce",
             "Stucki"});
-            this.ditherBox.Location = new System.Drawing.Point(53, 4);
+            this.ditherBox.Location = new System.Drawing.Point(53, 5);
             this.ditherBox.Name = "ditherBox";
             this.ditherBox.Size = new System.Drawing.Size(135, 24);
             this.ditherBox.TabIndex = 26;
@@ -297,7 +299,7 @@
             // 
             // widthInput
             // 
-            this.widthInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.widthInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.widthInput.Enabled = false;
             this.widthInput.Location = new System.Drawing.Point(2, 2);
             this.widthInput.Margin = new System.Windows.Forms.Padding(2);
@@ -306,24 +308,24 @@
             this.widthInput.TabIndex = 1;
             this.widthInput.Text = "0";
             this.widthInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.widthInput.TextChanged += new System.EventHandler(this.WidthInput_TextChanged);
             this.widthInput.Leave += new System.EventHandler(this.widthInput_Leave);
             // 
             // label6
             // 
-            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(80, 3);
             this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(20, 16);
+            this.label6.Size = new System.Drawing.Size(21, 16);
             this.label6.TabIndex = 0;
             this.label6.Text = "W";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
             // heightInput
             // 
-            this.heightInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.heightInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.heightInput.Enabled = false;
             this.heightInput.Location = new System.Drawing.Point(2, 2);
             this.heightInput.Margin = new System.Windows.Forms.Padding(2);
@@ -332,20 +334,19 @@
             this.heightInput.TabIndex = 2;
             this.heightInput.Text = "0";
             this.heightInput.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.heightInput.TextChanged += new System.EventHandler(this.HeightInput_TextChanged);
             this.heightInput.Leave += new System.EventHandler(this.heightInput_Leave);
             // 
             // label7
             // 
-            this.label7.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(80, 3);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(17, 16);
+            this.label7.Size = new System.Drawing.Size(21, 16);
             this.label7.TabIndex = 2;
             this.label7.Text = "H";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label5
             // 
@@ -635,8 +636,8 @@
             this.tableLayoutPanel7.ColumnCount = 2;
             this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel7.Controls.Add(this.XText, 1, 0);
-            this.tableLayoutPanel7.Controls.Add(this.XBox, 0, 0);
+            this.tableLayoutPanel7.Controls.Add(this.label6, 1, 0);
+            this.tableLayoutPanel7.Controls.Add(this.widthInput, 0, 0);
             this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel7.Location = new System.Drawing.Point(112, 3);
             this.tableLayoutPanel7.Name = "tableLayoutPanel7";
@@ -650,8 +651,8 @@
             this.tableLayoutPanel9.ColumnCount = 2;
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel9.Controls.Add(this.label6, 1, 0);
-            this.tableLayoutPanel9.Controls.Add(this.widthInput, 0, 0);
+            this.tableLayoutPanel9.Controls.Add(this.XBox, 0, 0);
+            this.tableLayoutPanel9.Controls.Add(this.XText, 1, 0);
             this.tableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel9.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel9.Name = "tableLayoutPanel9";
@@ -665,8 +666,8 @@
             this.tableLayoutPanel10.ColumnCount = 2;
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel10.Controls.Add(this.label7, 1, 0);
-            this.tableLayoutPanel10.Controls.Add(this.heightInput, 0, 0);
+            this.tableLayoutPanel10.Controls.Add(this.YBox, 0, 0);
+            this.tableLayoutPanel10.Controls.Add(this.YText, 1, 0);
             this.tableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel10.Location = new System.Drawing.Point(3, 32);
             this.tableLayoutPanel10.Name = "tableLayoutPanel10";
@@ -680,8 +681,8 @@
             this.tableLayoutPanel8.ColumnCount = 2;
             this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel8.Controls.Add(this.YText, 1, 0);
-            this.tableLayoutPanel8.Controls.Add(this.YBox, 0, 0);
+            this.tableLayoutPanel8.Controls.Add(this.label7, 1, 0);
+            this.tableLayoutPanel8.Controls.Add(this.heightInput, 0, 0);
             this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel8.Location = new System.Drawing.Point(112, 32);
             this.tableLayoutPanel8.Name = "tableLayoutPanel8";
@@ -689,20 +690,6 @@
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel8.Size = new System.Drawing.Size(103, 23);
             this.tableLayoutPanel8.TabIndex = 32;
-            // 
-            // tableLayoutPanel11
-            // 
-            this.tableLayoutPanel11.ColumnCount = 1;
-            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel11.Controls.Add(this.pixelateBar, 0, 1);
-            this.tableLayoutPanel11.Controls.Add(this.label5, 0, 0);
-            this.tableLayoutPanel11.Location = new System.Drawing.Point(200, 3);
-            this.tableLayoutPanel11.Name = "tableLayoutPanel11";
-            this.tableLayoutPanel11.RowCount = 2;
-            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel11.Size = new System.Drawing.Size(123, 90);
-            this.tableLayoutPanel11.TabIndex = 30;
             // 
             // tableLayoutPanel12
             // 
@@ -761,6 +748,199 @@
             this.tableLayoutPanel15.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel15.Size = new System.Drawing.Size(33, 54);
             this.tableLayoutPanel15.TabIndex = 1;
+            // 
+            // tableLayoutPanel22
+            // 
+            this.tableLayoutPanel22.ColumnCount = 1;
+            this.tableLayoutPanel22.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel22.Controls.Add(this.CropButton, 0, 0);
+            this.tableLayoutPanel22.Controls.Add(this.tableLayoutPanel23, 0, 1);
+            this.tableLayoutPanel22.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel22.Location = new System.Drawing.Point(322, 3);
+            this.tableLayoutPanel22.Name = "tableLayoutPanel22";
+            this.tableLayoutPanel22.RowCount = 2;
+            this.tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.06593F));
+            this.tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 65.93407F));
+            this.tableLayoutPanel22.Size = new System.Drawing.Size(225, 91);
+            this.tableLayoutPanel22.TabIndex = 32;
+            // 
+            // CropButton
+            // 
+            this.CropButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CropButton.Enabled = false;
+            this.CropButton.Location = new System.Drawing.Point(3, 3);
+            this.CropButton.Name = "CropButton";
+            this.CropButton.Size = new System.Drawing.Size(219, 24);
+            this.CropButton.TabIndex = 0;
+            this.CropButton.Text = "Crop Image";
+            this.CropButton.UseVisualStyleBackColor = true;
+            this.CropButton.Click += new System.EventHandler(this.CropButton_Click);
+            // 
+            // tableLayoutPanel23
+            // 
+            this.tableLayoutPanel23.ColumnCount = 2;
+            this.tableLayoutPanel23.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel23.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel24, 0, 1);
+            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel25, 0, 0);
+            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel26, 1, 0);
+            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel27, 1, 1);
+            this.tableLayoutPanel23.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel23.Location = new System.Drawing.Point(3, 33);
+            this.tableLayoutPanel23.Name = "tableLayoutPanel23";
+            this.tableLayoutPanel23.RowCount = 2;
+            this.tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel23.Size = new System.Drawing.Size(219, 55);
+            this.tableLayoutPanel23.TabIndex = 1;
+            // 
+            // tableLayoutPanel24
+            // 
+            this.tableLayoutPanel24.ColumnCount = 2;
+            this.tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel24.Controls.Add(this.CropYlabel, 1, 0);
+            this.tableLayoutPanel24.Controls.Add(this.CropYBox, 0, 0);
+            this.tableLayoutPanel24.Location = new System.Drawing.Point(3, 30);
+            this.tableLayoutPanel24.Name = "tableLayoutPanel24";
+            this.tableLayoutPanel24.RowCount = 1;
+            this.tableLayoutPanel24.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel24.Size = new System.Drawing.Size(103, 21);
+            this.tableLayoutPanel24.TabIndex = 1;
+            // 
+            // CropYlabel
+            // 
+            this.CropYlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropYlabel.AutoSize = true;
+            this.CropYlabel.Location = new System.Drawing.Point(81, 2);
+            this.CropYlabel.Name = "CropYlabel";
+            this.CropYlabel.Size = new System.Drawing.Size(19, 16);
+            this.CropYlabel.TabIndex = 1;
+            this.CropYlabel.Text = "Y";
+            this.CropYlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // CropYBox
+            // 
+            this.CropYBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropYBox.Enabled = false;
+            this.CropYBox.Location = new System.Drawing.Point(3, 3);
+            this.CropYBox.Name = "CropYBox";
+            this.CropYBox.Size = new System.Drawing.Size(72, 22);
+            this.CropYBox.TabIndex = 0;
+            this.CropYBox.Text = "0";
+            this.CropYBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CropYBox.Leave += new System.EventHandler(this.CropYBox_Leave);
+            // 
+            // tableLayoutPanel25
+            // 
+            this.tableLayoutPanel25.ColumnCount = 2;
+            this.tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel25.Controls.Add(this.CropXlabel, 1, 0);
+            this.tableLayoutPanel25.Controls.Add(this.CropXBox, 0, 0);
+            this.tableLayoutPanel25.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel25.Name = "tableLayoutPanel25";
+            this.tableLayoutPanel25.RowCount = 1;
+            this.tableLayoutPanel25.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel25.Size = new System.Drawing.Size(103, 21);
+            this.tableLayoutPanel25.TabIndex = 2;
+            // 
+            // CropXlabel
+            // 
+            this.CropXlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropXlabel.AutoSize = true;
+            this.CropXlabel.Location = new System.Drawing.Point(81, 2);
+            this.CropXlabel.Name = "CropXlabel";
+            this.CropXlabel.Size = new System.Drawing.Size(19, 16);
+            this.CropXlabel.TabIndex = 1;
+            this.CropXlabel.Text = "X";
+            this.CropXlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // CropXBox
+            // 
+            this.CropXBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropXBox.Enabled = false;
+            this.CropXBox.Location = new System.Drawing.Point(3, 3);
+            this.CropXBox.Name = "CropXBox";
+            this.CropXBox.Size = new System.Drawing.Size(72, 22);
+            this.CropXBox.TabIndex = 0;
+            this.CropXBox.Text = "0";
+            this.CropXBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CropXBox.Leave += new System.EventHandler(this.CropXBox_Leave);
+            // 
+            // tableLayoutPanel26
+            // 
+            this.tableLayoutPanel26.ColumnCount = 2;
+            this.tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel26.Controls.Add(this.CropWBox, 0, 0);
+            this.tableLayoutPanel26.Controls.Add(this.CropWlabel, 1, 0);
+            this.tableLayoutPanel26.Location = new System.Drawing.Point(112, 3);
+            this.tableLayoutPanel26.Name = "tableLayoutPanel26";
+            this.tableLayoutPanel26.RowCount = 1;
+            this.tableLayoutPanel26.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel26.Size = new System.Drawing.Size(104, 21);
+            this.tableLayoutPanel26.TabIndex = 3;
+            // 
+            // CropWBox
+            // 
+            this.CropWBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropWBox.Enabled = false;
+            this.CropWBox.Location = new System.Drawing.Point(3, 3);
+            this.CropWBox.Name = "CropWBox";
+            this.CropWBox.Size = new System.Drawing.Size(73, 22);
+            this.CropWBox.TabIndex = 0;
+            this.CropWBox.Text = "0";
+            this.CropWBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CropWBox.Leave += new System.EventHandler(this.CropWBox_Leave);
+            // 
+            // CropWlabel
+            // 
+            this.CropWlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropWlabel.AutoSize = true;
+            this.CropWlabel.Location = new System.Drawing.Point(82, 2);
+            this.CropWlabel.Name = "CropWlabel";
+            this.CropWlabel.Size = new System.Drawing.Size(19, 16);
+            this.CropWlabel.TabIndex = 1;
+            this.CropWlabel.Text = "W";
+            this.CropWlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel27
+            // 
+            this.tableLayoutPanel27.ColumnCount = 2;
+            this.tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel27.Controls.Add(this.CropHlabel, 1, 0);
+            this.tableLayoutPanel27.Controls.Add(this.CropHBox, 0, 0);
+            this.tableLayoutPanel27.Location = new System.Drawing.Point(112, 30);
+            this.tableLayoutPanel27.Name = "tableLayoutPanel27";
+            this.tableLayoutPanel27.RowCount = 1;
+            this.tableLayoutPanel27.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel27.Size = new System.Drawing.Size(104, 21);
+            this.tableLayoutPanel27.TabIndex = 4;
+            // 
+            // CropHlabel
+            // 
+            this.CropHlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropHlabel.AutoSize = true;
+            this.CropHlabel.Location = new System.Drawing.Point(82, 2);
+            this.CropHlabel.Name = "CropHlabel";
+            this.CropHlabel.Size = new System.Drawing.Size(19, 16);
+            this.CropHlabel.TabIndex = 1;
+            this.CropHlabel.Text = "H";
+            this.CropHlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // CropHBox
+            // 
+            this.CropHBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.CropHBox.Enabled = false;
+            this.CropHBox.Location = new System.Drawing.Point(3, 3);
+            this.CropHBox.Name = "CropHBox";
+            this.CropHBox.Size = new System.Drawing.Size(73, 22);
+            this.CropHBox.TabIndex = 0;
+            this.CropHBox.Text = "0";
+            this.CropHBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.CropHBox.Leave += new System.EventHandler(this.CropHBox_Leave);
             // 
             // tableLayoutPanel21
             // 
@@ -864,8 +1044,21 @@
             this.maxColorsBox.TabIndex = 14;
             this.maxColorsBox.Text = "8";
             this.maxColorsBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.maxColorsBox.TextChanged += new System.EventHandler(this.maxColorsBox_TextChanged);
             this.maxColorsBox.Leave += new System.EventHandler(this.maxColorsBox_Leave);
+            // 
+            // tableLayoutPanel11
+            // 
+            this.tableLayoutPanel11.ColumnCount = 1;
+            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel11.Controls.Add(this.pixelateBar, 0, 1);
+            this.tableLayoutPanel11.Controls.Add(this.label5, 0, 0);
+            this.tableLayoutPanel11.Location = new System.Drawing.Point(200, 3);
+            this.tableLayoutPanel11.Name = "tableLayoutPanel11";
+            this.tableLayoutPanel11.RowCount = 2;
+            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel11.Size = new System.Drawing.Size(123, 90);
+            this.tableLayoutPanel11.TabIndex = 30;
             // 
             // tableLayoutPanel16
             // 
@@ -882,186 +1075,6 @@
             this.tableLayoutPanel16.Size = new System.Drawing.Size(191, 32);
             this.tableLayoutPanel16.TabIndex = 34;
             // 
-            // tableLayoutPanel22
-            // 
-            this.tableLayoutPanel22.ColumnCount = 1;
-            this.tableLayoutPanel22.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel22.Controls.Add(this.CropButton, 0, 0);
-            this.tableLayoutPanel22.Controls.Add(this.tableLayoutPanel23, 0, 1);
-            this.tableLayoutPanel22.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel22.Location = new System.Drawing.Point(322, 3);
-            this.tableLayoutPanel22.Name = "tableLayoutPanel22";
-            this.tableLayoutPanel22.RowCount = 2;
-            this.tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.06593F));
-            this.tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 65.93407F));
-            this.tableLayoutPanel22.Size = new System.Drawing.Size(225, 91);
-            this.tableLayoutPanel22.TabIndex = 32;
-            // 
-            // CropButton
-            // 
-            this.CropButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CropButton.Location = new System.Drawing.Point(3, 3);
-            this.CropButton.Name = "CropButton";
-            this.CropButton.Size = new System.Drawing.Size(219, 25);
-            this.CropButton.TabIndex = 0;
-            this.CropButton.Text = "Crop Image";
-            this.CropButton.UseVisualStyleBackColor = true;
-            this.CropButton.Click += new System.EventHandler(this.CropButton_Click);
-            // 
-            // tableLayoutPanel23
-            // 
-            this.tableLayoutPanel23.ColumnCount = 2;
-            this.tableLayoutPanel23.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel23.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel24, 0, 1);
-            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel25, 0, 0);
-            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel26, 1, 0);
-            this.tableLayoutPanel23.Controls.Add(this.tableLayoutPanel27, 1, 1);
-            this.tableLayoutPanel23.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel23.Location = new System.Drawing.Point(3, 34);
-            this.tableLayoutPanel23.Name = "tableLayoutPanel23";
-            this.tableLayoutPanel23.RowCount = 2;
-            this.tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel23.Size = new System.Drawing.Size(219, 54);
-            this.tableLayoutPanel23.TabIndex = 1;
-            // 
-            // CropHBox
-            // 
-            this.CropHBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CropHBox.Location = new System.Drawing.Point(3, 3);
-            this.CropHBox.Name = "CropHBox";
-            this.CropHBox.Size = new System.Drawing.Size(72, 22);
-            this.CropHBox.TabIndex = 0;
-            this.CropHBox.Text = "0";
-            this.CropHBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // tableLayoutPanel24
-            // 
-            this.tableLayoutPanel24.ColumnCount = 2;
-            this.tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel24.Controls.Add(this.CropHlabel, 1, 0);
-            this.tableLayoutPanel24.Controls.Add(this.CropHBox, 0, 0);
-            this.tableLayoutPanel24.Location = new System.Drawing.Point(3, 30);
-            this.tableLayoutPanel24.Name = "tableLayoutPanel24";
-            this.tableLayoutPanel24.RowCount = 1;
-            this.tableLayoutPanel24.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel24.Size = new System.Drawing.Size(103, 21);
-            this.tableLayoutPanel24.TabIndex = 1;
-            // 
-            // CropHlabel
-            // 
-            this.CropHlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.CropHlabel.AutoSize = true;
-            this.CropHlabel.Location = new System.Drawing.Point(81, 2);
-            this.CropHlabel.Name = "CropHlabel";
-            this.CropHlabel.Size = new System.Drawing.Size(19, 16);
-            this.CropHlabel.TabIndex = 1;
-            this.CropHlabel.Text = "H";
-            // 
-            // tableLayoutPanel25
-            // 
-            this.tableLayoutPanel25.ColumnCount = 2;
-            this.tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel25.Controls.Add(this.CropWBox, 0, 0);
-            this.tableLayoutPanel25.Controls.Add(this.CropWlabel, 1, 0);
-            this.tableLayoutPanel25.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel25.Name = "tableLayoutPanel25";
-            this.tableLayoutPanel25.RowCount = 1;
-            this.tableLayoutPanel25.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel25.Size = new System.Drawing.Size(103, 21);
-            this.tableLayoutPanel25.TabIndex = 2;
-            // 
-            // tableLayoutPanel26
-            // 
-            this.tableLayoutPanel26.ColumnCount = 2;
-            this.tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel26.Controls.Add(this.CropXBox, 0, 0);
-            this.tableLayoutPanel26.Controls.Add(this.CropXlabel, 1, 0);
-            this.tableLayoutPanel26.Location = new System.Drawing.Point(112, 3);
-            this.tableLayoutPanel26.Name = "tableLayoutPanel26";
-            this.tableLayoutPanel26.RowCount = 1;
-            this.tableLayoutPanel26.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel26.Size = new System.Drawing.Size(104, 21);
-            this.tableLayoutPanel26.TabIndex = 3;
-            // 
-            // tableLayoutPanel27
-            // 
-            this.tableLayoutPanel27.ColumnCount = 2;
-            this.tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel27.Controls.Add(this.CropYBox, 0, 0);
-            this.tableLayoutPanel27.Controls.Add(this.CropYlabel, 1, 0);
-            this.tableLayoutPanel27.Location = new System.Drawing.Point(112, 30);
-            this.tableLayoutPanel27.Name = "tableLayoutPanel27";
-            this.tableLayoutPanel27.RowCount = 1;
-            this.tableLayoutPanel27.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel27.Size = new System.Drawing.Size(104, 21);
-            this.tableLayoutPanel27.TabIndex = 4;
-            // 
-            // CropWBox
-            // 
-            this.CropWBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CropWBox.Location = new System.Drawing.Point(3, 3);
-            this.CropWBox.Name = "CropWBox";
-            this.CropWBox.Size = new System.Drawing.Size(72, 22);
-            this.CropWBox.TabIndex = 0;
-            this.CropWBox.Text = "0";
-            this.CropWBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // CropXBox
-            // 
-            this.CropXBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CropXBox.Location = new System.Drawing.Point(3, 3);
-            this.CropXBox.Name = "CropXBox";
-            this.CropXBox.Size = new System.Drawing.Size(73, 22);
-            this.CropXBox.TabIndex = 0;
-            this.CropXBox.Text = "0";
-            this.CropXBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // CropYBox
-            // 
-            this.CropYBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CropYBox.Location = new System.Drawing.Point(3, 3);
-            this.CropYBox.Name = "CropYBox";
-            this.CropYBox.Size = new System.Drawing.Size(73, 22);
-            this.CropYBox.TabIndex = 0;
-            this.CropYBox.Text = "0";
-            this.CropYBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // CropWlabel
-            // 
-            this.CropWlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.CropWlabel.AutoSize = true;
-            this.CropWlabel.Location = new System.Drawing.Point(81, 2);
-            this.CropWlabel.Name = "CropWlabel";
-            this.CropWlabel.Size = new System.Drawing.Size(19, 16);
-            this.CropWlabel.TabIndex = 1;
-            this.CropWlabel.Text = "W";
-            // 
-            // CropXlabel
-            // 
-            this.CropXlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.CropXlabel.AutoSize = true;
-            this.CropXlabel.Location = new System.Drawing.Point(82, 2);
-            this.CropXlabel.Name = "CropXlabel";
-            this.CropXlabel.Size = new System.Drawing.Size(19, 16);
-            this.CropXlabel.TabIndex = 1;
-            this.CropXlabel.Text = "X";
-            // 
-            // CropYlabel
-            // 
-            this.CropYlabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.CropYlabel.AutoSize = true;
-            this.CropYlabel.Location = new System.Drawing.Point(82, 2);
-            this.CropYlabel.Name = "CropYlabel";
-            this.CropYlabel.Size = new System.Drawing.Size(19, 16);
-            this.CropYlabel.TabIndex = 1;
-            this.CropYlabel.Text = "Y";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1074,6 +1087,8 @@
             this.MinimumSize = new System.Drawing.Size(572, 646);
             this.Name = "MainForm";
             this.Text = "Rec Room Painter";
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
+            this.Enter += new System.EventHandler(this.MainForm_Enter);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pixelateBar)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -1093,8 +1108,6 @@
             this.tableLayoutPanel10.PerformLayout();
             this.tableLayoutPanel8.ResumeLayout(false);
             this.tableLayoutPanel8.PerformLayout();
-            this.tableLayoutPanel11.ResumeLayout(false);
-            this.tableLayoutPanel11.PerformLayout();
             this.tableLayoutPanel12.ResumeLayout(false);
             this.tableLayoutPanel12.PerformLayout();
             this.tableLayoutPanel13.ResumeLayout(false);
@@ -1102,16 +1115,6 @@
             this.tableLayoutPanel14.PerformLayout();
             this.tableLayoutPanel15.ResumeLayout(false);
             this.tableLayoutPanel15.PerformLayout();
-            this.tableLayoutPanel21.ResumeLayout(false);
-            this.tableLayoutPanel20.ResumeLayout(false);
-            this.tableLayoutPanel20.PerformLayout();
-            this.tableLayoutPanel17.ResumeLayout(false);
-            this.tableLayoutPanel18.ResumeLayout(false);
-            this.tableLayoutPanel18.PerformLayout();
-            this.tableLayoutPanel19.ResumeLayout(false);
-            this.tableLayoutPanel19.PerformLayout();
-            this.tableLayoutPanel16.ResumeLayout(false);
-            this.tableLayoutPanel16.PerformLayout();
             this.tableLayoutPanel22.ResumeLayout(false);
             this.tableLayoutPanel23.ResumeLayout(false);
             this.tableLayoutPanel24.ResumeLayout(false);
@@ -1122,80 +1125,93 @@
             this.tableLayoutPanel26.PerformLayout();
             this.tableLayoutPanel27.ResumeLayout(false);
             this.tableLayoutPanel27.PerformLayout();
+            this.tableLayoutPanel21.ResumeLayout(false);
+            this.tableLayoutPanel20.ResumeLayout(false);
+            this.tableLayoutPanel20.PerformLayout();
+            this.tableLayoutPanel17.ResumeLayout(false);
+            this.tableLayoutPanel18.ResumeLayout(false);
+            this.tableLayoutPanel18.PerformLayout();
+            this.tableLayoutPanel19.ResumeLayout(false);
+            this.tableLayoutPanel19.PerformLayout();
+            this.tableLayoutPanel11.ResumeLayout(false);
+            this.tableLayoutPanel11.PerformLayout();
+            this.tableLayoutPanel16.ResumeLayout(false);
+            this.tableLayoutPanel16.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.Button DrawPositionButton;
-        private System.Windows.Forms.Label XText;
-        private System.Windows.Forms.Label YText;
-        private System.Windows.Forms.TextBox YBox;
-        private System.Windows.Forms.TextBox XBox;
-        private System.Windows.Forms.Button startButton;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button uploadButton;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.TextBox widthInput;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox heightInput;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TextBox skipColorBox;
-        private System.Windows.Forms.ComboBox ditherBox;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.CheckBox firstLayerFill;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label estTime;
-        private System.Windows.Forms.Label estTimeLabel;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Button estButton;
-        private System.Windows.Forms.TextBox GapXBox;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox GapYBox;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TrackBar pixelateBar;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Button clearButton;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel10;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel11;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel12;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel13;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel14;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel15;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel20;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel17;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel18;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel19;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox maxColorsBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel16;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel21;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel22;
-        private System.Windows.Forms.Button CropButton;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel23;
-        private System.Windows.Forms.TextBox CropHBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel24;
-        private System.Windows.Forms.Label CropHlabel;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel25;
-        private System.Windows.Forms.TextBox CropWBox;
-        private System.Windows.Forms.Label CropWlabel;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel26;
-        private System.Windows.Forms.TextBox CropXBox;
-        private System.Windows.Forms.Label CropXlabel;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel27;
-        private System.Windows.Forms.TextBox CropYBox;
-        private System.Windows.Forms.Label CropYlabel;
+
+        public System.Windows.Forms.OpenFileDialog openFileDialog1;
+        public System.Windows.Forms.Button DrawPositionButton;
+        public System.Windows.Forms.Label XText;
+        public System.Windows.Forms.Label YText;
+        public System.Windows.Forms.TextBox YBox;
+        public System.Windows.Forms.TextBox XBox;
+        public System.Windows.Forms.Button startButton;
+        public System.Windows.Forms.Label label3;
+        public System.Windows.Forms.Button uploadButton;
+        public System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.TextBox widthInput;
+        public System.Windows.Forms.Label label6;
+        public System.Windows.Forms.TextBox heightInput;
+        public System.Windows.Forms.Label label7;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        public System.Windows.Forms.TextBox skipColorBox;
+        public System.Windows.Forms.ComboBox ditherBox;
+        public System.Windows.Forms.Label label4;
+        public System.Windows.Forms.CheckBox firstLayerFill;
+        public System.Windows.Forms.Label label5;
+        public System.Windows.Forms.Label estTime;
+        public System.Windows.Forms.Label estTimeLabel;
+        public System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.Button estButton;
+        public System.Windows.Forms.TextBox GapXBox;
+        public System.Windows.Forms.Label label1;
+        public System.Windows.Forms.TextBox GapYBox;
+        public System.Windows.Forms.Label label8;
+        public System.Windows.Forms.Label label9;
+        public System.Windows.Forms.TrackBar pixelateBar;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        public System.Windows.Forms.Button clearButton;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel10;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel11;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel12;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel13;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel14;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel15;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel20;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel17;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel18;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel19;
+        public System.Windows.Forms.Label label2;
+        public System.Windows.Forms.TextBox maxColorsBox;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel16;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel21;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel22;
+        public System.Windows.Forms.Button CropButton;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel23;
+        public System.Windows.Forms.TextBox CropHBox;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel24;
+        public System.Windows.Forms.Label CropHlabel;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel25;
+        public System.Windows.Forms.TextBox CropWBox;
+        public System.Windows.Forms.Label CropWlabel;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel26;
+        public System.Windows.Forms.TextBox CropXBox;
+        public System.Windows.Forms.Label CropXlabel;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel27;
+        public System.Windows.Forms.TextBox CropYBox;
+        public System.Windows.Forms.Label CropYlabel;
     }
 }
 

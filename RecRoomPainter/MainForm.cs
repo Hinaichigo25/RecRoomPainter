@@ -31,6 +31,19 @@ namespace RecRoomPainter {
             public int DrawY {
                 get; set;
             }
+            public int CropW {
+                get; set;
+            }
+            public int CropH {
+                get; set;
+            }
+            public int CropX {
+                get; set;
+            }
+            public int CropY {
+                get; set;
+            }
+
             public double Pixelation {
                 get; set;
             }
@@ -54,11 +67,15 @@ namespace RecRoomPainter {
             }
         }
 
-        UserSettingVars UserSettings = new UserSettingVars {
+        public static UserSettingVars UserSettings = new UserSettingVars {
             DrawW = 0,
             DrawH = 0,
             DrawX = 0,
             DrawY = 0,
+            CropW = 0,
+            CropH = 0,
+            CropX = 0,
+            CropY = 0,
             Pixelation = 1,
             MaxColors = 16,
             SkipColors = 0,
@@ -69,8 +86,8 @@ namespace RecRoomPainter {
         };
 
 
-        Bitmap imageFile;
-        Bitmap image;
+        public static Bitmap imageFile;
+        public static Bitmap imageModified;
         public static Bitmap imagePreview;
 
         bool scanDirection = false;
@@ -142,13 +159,28 @@ namespace RecRoomPainter {
             CropYBox.Enabled = enable;
         }
 
+        public void UpdateUITextValues() {
+            widthInput.Text = UserSettings.DrawW.ToString();
+            heightInput.Text = UserSettings.DrawH.ToString();
+            skipColorBox.Text = UserSettings.SkipColors.ToString();
+            maxColorsBox.Text = UserSettings.MaxColors.ToString();
+            XBox.Text = UserSettings.DrawX.ToString();
+            YBox.Text = UserSettings.DrawY.ToString();
+            GapXBox.Text = (UserSettings.PenSizeX - 1).ToString();
+            GapYBox.Text = (UserSettings.PenSizeY - 1).ToString();
+            CropHBox.Text = UserSettings.CropH.ToString();
+            CropWBox.Text = UserSettings.CropW.ToString();
+            CropXBox.Text = UserSettings.CropX.ToString();
+            CropYBox.Text = UserSettings.CropY.ToString();
+        }
 
-        void ProcessImage() {
+
+        public void ProcessImage() {
             try {
                 EnableControls(false);
                 progressBar1.Value = 0;
-                image = imageFile;
-                image = ResizeImage(imageFile, new Size(UserSettings.DrawW, UserSettings.DrawH), UserSettings.Pixelation);
+                imageModified = (Bitmap)imageFile.Clone();
+                imageModified = ResizeImage(imageFile, new Size(UserSettings.DrawW, UserSettings.DrawH), UserSettings.Pixelation);
                 progressBar1.Value = 10;
 
                 IDitherer dither = OrderedDitherer.Bayer2x2;
@@ -202,15 +234,15 @@ namespace RecRoomPainter {
                         break;
                 }
                 if (UserSettings.DitherPattern > 0) {
-                    BitmapExtensions.Dither(image, quantizer, dither);
+                    BitmapExtensions.Dither(imageModified, quantizer, dither);
                 }
                 else {
-                    image = image.ConvertPixelFormat(PixelFormat.Format64bppArgb, quantizer);
+                    imageModified = imageModified.ConvertPixelFormat(PixelFormat.Format32bppArgb, quantizer);
                 }
                 progressBar1.Value = 50;
-
-                image = BitmapExtensions.Resize(image, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSizeX), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSizeY)), ScalingMode.NearestNeighbor);
-
+                imageModified = BitmapExtensions.Resize(imageModified, imageFile.Size, ScalingMode.NearestNeighbor);
+                imageModified = CropImageSet(imageModified);
+                imageModified = BitmapExtensions.Resize(imageModified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSizeX), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSizeY)), ScalingMode.NearestNeighbor);
                 SetPreview();
 
                 progressBar1.Value = 100;
@@ -506,28 +538,28 @@ namespace RecRoomPainter {
             }
             estimatedTime += 1000;
 
-            Color[] pallet = ImageToPallet(image);
+            Color[] pallet = ImageToPallet(imageModified);
 
             for (int c = 0; c < pallet.Length; c++) {
                 float progress = (float)(c / (float)pallet.Length) * 100;
                 progressBar1.Value = (int)progress;
-                if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 255)) {
+                if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 0, 255)) {
                     continue;
                 }
 
-                List<List<int>> cMatrix = new List<List<int>>(image.Width);
+                List<List<int>> cMatrix = new List<List<int>>(imageModified.Width);
                 if (UserSettings.FillFirstLayer && c == 0) {
                     // Initialize the 2D list with rows and columns filled with 0
-                    for (int i = 0; i < image.Width; i++) {
-                        List<int> row = new List<int>(image.Height);
-                        for (int j = 0; j < image.Height; j++) {
+                    for (int i = 0; i < imageModified.Width; i++) {
+                        List<int> row = new List<int>(imageModified.Height);
+                        for (int j = 0; j < imageModified.Height; j++) {
                             row.Add(1);
                         }
                         cMatrix.Add(row);
                     }
                 }
                 else {
-                    cMatrix = CoverageMatrix(image, pallet[c]);
+                    cMatrix = CoverageMatrix(imageModified, pallet[c]);
                 }
 
                 if (!est) {
@@ -548,11 +580,13 @@ namespace RecRoomPainter {
                     }
                 }
                 if (!est) {
-                    skipColorBox.Text = c.ToString();
+                    UserSettings.SkipColors = c;
+                    UpdateUITextValues();
                 }
             }
             if (!est) {
-                skipColorBox.Text = 0.ToString();
+                UserSettings.SkipColors = 0;
+                UpdateUITextValues();
             }
             return true;
         }
@@ -562,14 +596,20 @@ namespace RecRoomPainter {
             // picture that the user chose.
             if (openFileDialog1.ShowDialog() == DialogResult.OK) {
                 imageFile = new Bitmap(openFileDialog1.FileName);
+                imageFile = imageFile.ConvertPixelFormat(PixelFormat.Format32bppArgb);
                 UserSettings.DrawW = imageFile.Width;
                 UserSettings.DrawH = imageFile.Height;
-                widthInput.Text = UserSettings.DrawW.ToString();
-                heightInput.Text = UserSettings.DrawH.ToString();
-                image = imageFile;
+                UserSettings.DrawX = 0;
+                UserSettings.DrawY = 0;
+                UserSettings.CropW = imageFile.Width;
+                UserSettings.CropH = imageFile.Height;
+                UserSettings.CropX = 0;
+                UserSettings.CropY = 0;
+                UpdateUITextValues();
+                imageModified = imageFile;
                 ProcessImage();
-                pictureBox1.Image = BitmapExtensions.Resize(image, new Size(1920, 1080), scaleType, true);
-                imagePreview = image;
+                pictureBox1.Image = BitmapExtensions.Resize(imageModified, new Size(1920, 1080), scaleType, true);
+                imagePreview = imageModified;
                 EnableControls(true);
             }
         }
@@ -577,27 +617,10 @@ namespace RecRoomPainter {
         private void ClearButton_Click(object sender, EventArgs e) {
             pictureBox1.Image = null;
             imageFile = null;
-            image = null;
+            imageModified = null;
+            imageModified = null;
             imagePreview = null;
             EnableControls(false);
-        }
-
-
-
-        private void WidthInput_TextChanged(object sender, EventArgs e) {
-            // Change in width of image
-            try {
-                UserSettings.DrawW = Convert.ToInt32(widthInput.Text);
-                UserSettings.DrawW = int.Parse(widthInput.Text);
-            }
-            catch (Exception) {
-                UserSettings.DrawW = image.Width;
-            }
-        }
-
-
-        private void DrawPositionButton_Click(object sender, EventArgs e) {
-
         }
 
 
@@ -609,62 +632,6 @@ namespace RecRoomPainter {
             }
             catch (Exception) {
                 MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Image Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            }
-        }
-
-
-        private void HeightInput_TextChanged(object sender, EventArgs e) {
-            // Change in height of image
-            try {
-                UserSettings.DrawH = Convert.ToInt32(heightInput.Text);
-                UserSettings.DrawH = int.Parse(heightInput.Text);
-            }
-            catch (Exception) {
-                UserSettings.DrawH = image.Height;
-            }
-        }
-
-        private void XBox_TextChanged(object sender, EventArgs e) {
-            // Delay interval between the drawing of each pixel
-            try {
-                UserSettings.DrawX = Convert.ToInt32(XBox.Text);
-                UserSettings.DrawX = int.Parse(XBox.Text);
-            }
-            catch (Exception) {
-                UserSettings.DrawX = 0;
-            }
-        }
-
-        private void YBox_TextChanged(object sender, EventArgs e) {
-            // Delay interval between the drawing of each pixel
-            try {
-                UserSettings.DrawY = Convert.ToInt32(YBox.Text);
-                UserSettings.DrawY = int.Parse(YBox.Text);
-            }
-            catch (Exception) {
-                UserSettings.DrawY = 0;
-            }
-        }
-
-
-        private void maxColorsBox_TextChanged(object sender, EventArgs e) {
-            try {
-                UserSettings.MaxColors = Convert.ToInt32(maxColorsBox.Text);
-                UserSettings.MaxColors = int.Parse(maxColorsBox.Text);
-            }
-            catch (Exception) {
-                UserSettings.MaxColors = 1;
-            }
-        }
-
-
-        private void skipColorBox_TextChanged(object sender, EventArgs e) {
-            try {
-                UserSettings.SkipColors = Convert.ToInt32(skipColorBox.Text);
-                UserSettings.SkipColors = int.Parse(skipColorBox.Text);
-            }
-            catch (Exception) {
-                UserSettings.SkipColors = 0;
             }
         }
 
@@ -693,8 +660,28 @@ namespace RecRoomPainter {
 
         }
 
+        public static Bitmap CropImageSet(Bitmap img) {
+            Bitmap newImg = (Bitmap)img.Clone();
+            for (int i = 0; i < newImg.Width; i++) {
+                for (int j = 0; j < newImg.Height; j++) {
+                    if (i < UserSettings.CropX) {
+                        newImg.SetPixel(i, j, System.Drawing.Color.FromArgb(255, 255, 0, 255));
+                    }
+                    if (i > UserSettings.CropW) {
+                        newImg.SetPixel(i, j, System.Drawing.Color.FromArgb(255, 255, 0, 255));
+                    }
+                    if (j < UserSettings.CropY) {
+                        newImg.SetPixel(i, j, System.Drawing.Color.FromArgb(255, 255, 0, 255));
+                    }
+                    if (j > UserSettings.CropH) {
+                        newImg.SetPixel(i, j, System.Drawing.Color.FromArgb(255, 255, 0, 255));
+                    }
+                }
+            }
+            return newImg;
+        }
         public void SetPreview() {
-            imagePreview = (Bitmap)image.Clone();
+            imagePreview = (Bitmap)imageModified.Clone();
             pictureBox1.Image = BitmapExtensions.Resize(imagePreview, new Size((int)Math.Round(imagePreview.Width * UserSettings.PenSizeX), (int)Math.Round(imagePreview.Height * UserSettings.PenSizeY)), scaleType, true);
         }
 
@@ -718,11 +705,27 @@ namespace RecRoomPainter {
         }
 
         private void widthInput_Leave(object sender, EventArgs e) {
+            // Change in width of image
+            try {
+                UserSettings.DrawW = Convert.ToInt32(widthInput.Text);
+                UserSettings.DrawW = int.Parse(widthInput.Text);
+            }
+            catch (Exception) {
+                UserSettings.DrawW = imageModified.Width;
+            }
             ProcessImage();
 
         }
 
         private void heightInput_Leave(object sender, EventArgs e) {
+            // Change in height of image
+            try {
+                UserSettings.DrawH = Convert.ToInt32(heightInput.Text);
+                UserSettings.DrawH = int.Parse(heightInput.Text);
+            }
+            catch (Exception) {
+                UserSettings.DrawH = imageModified.Height;
+            }
             ProcessImage();
         }
 
@@ -747,6 +750,13 @@ namespace RecRoomPainter {
         }
 
         private void maxColorsBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.MaxColors = Convert.ToInt32(maxColorsBox.Text);
+                UserSettings.MaxColors = int.Parse(maxColorsBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.MaxColors = 1;
+            }
             ProcessImage();
         }
 
@@ -793,14 +803,16 @@ namespace RecRoomPainter {
                         setPosition();
                     };
 
-                    XBox.Text = Convert.ToString(m.Location.X + locationOffset);
-                    YBox.Text = Convert.ToString(m.Location.Y + locationOffset);
+                    UserSettings.DrawX = m.Location.X + locationOffset;
+                    UserSettings.DrawY = m.Location.Y + locationOffset;
+                    UpdateUITextValues();
 
                     if (m.Size != lastSize) {
                         int newx = m.Size.Width - sizeOffset;
                         int newy = m.Size.Height - sizeOffset;
-                        widthInput.Text = newx.ToString();
-                        heightInput.Text = newy.ToString();
+                        UserSettings.DrawW = newx;
+                        UserSettings.DrawH = newy;
+                        UpdateUITextValues();
                         ProcessImage();
                         m.UpdateImage(imagePreview);
                     }
@@ -814,7 +826,96 @@ namespace RecRoomPainter {
         }
 
         private void CropButton_Click(object sender, EventArgs e) {
+            MouseEventArgs mouse = e as MouseEventArgs;
+            CropWindow m = new CropWindow(mouse);
+            m.Show();
+            WindowState = FormWindowState.Minimized;
+            m.pictureBox1.Image = imagePreview;
+            m.Size = new Size(m.pictureBox1.Location.X + imageModified.Width, m.pictureBox1.Location.Y + imageModified.Height);
+            m.StartPosition = FormStartPosition.CenterScreen;
 
+        }
+
+        private void CropYBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.CropY = Convert.ToInt32(CropYBox.Text);
+                UserSettings.CropY = int.Parse(CropYBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.CropY = 0;
+            }
+        }
+
+        private void CropXBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.CropX = Convert.ToInt32(CropXBox.Text);
+                UserSettings.CropX = int.Parse(CropXBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.CropX = 0;
+            }
+        }
+
+        private void CropHBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.CropH = Convert.ToInt32(CropHBox.Text);
+                UserSettings.CropH = int.Parse(CropHBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.CropH = 0;
+            }
+        }
+
+        private void CropWBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.CropW = Convert.ToInt32(CropWBox.Text);
+                UserSettings.CropW = int.Parse(CropWBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.CropW = 0;
+            }
+        }
+
+        private void YBox_Leave(object sender, EventArgs e) {
+            // Delay interval between the drawing of each pixel
+            try {
+                UserSettings.DrawY = Convert.ToInt32(YBox.Text);
+                UserSettings.DrawY = int.Parse(YBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.DrawY = 0;
+            }
+        }
+
+        private void XBox_Leave(object sender, EventArgs e) {
+            // Delay interval between the drawing of each pixel
+            try {
+                UserSettings.DrawX = Convert.ToInt32(XBox.Text);
+                UserSettings.DrawX = int.Parse(XBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.DrawX = 0;
+            }
+        }
+
+        private void skipColorBox_Leave(object sender, EventArgs e) {
+            try {
+                UserSettings.SkipColors = Convert.ToInt32(skipColorBox.Text);
+                UserSettings.SkipColors = int.Parse(skipColorBox.Text);
+            }
+            catch (Exception) {
+                UserSettings.SkipColors = 0;
+            }
+        }
+
+        private void MainForm_Enter(object sender, EventArgs e) {
+
+        }
+
+        private void MainForm_Activated(object sender, EventArgs e) {
+            UpdateUITextValues();
+            if (imageModified != null)
+                ProcessImage();
         }
     }
 }
