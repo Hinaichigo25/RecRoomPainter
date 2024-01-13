@@ -16,7 +16,7 @@ namespace RecRoomPainter {
         public static ScalingMode scaleType = ScalingMode.Box;
 
         const int MOUSEDELAY = 40;
-        const int COLORCHANGEDELAY = 2000;
+        const int COLORCHANGEDELAY = 4000;
 
         public class UserSettingVars {
             public int DrawW {
@@ -303,6 +303,8 @@ namespace RecRoomPainter {
             mouse_event(MOUSEEVENTF_LEFTDOWN, HexCLocationX, HexCLocationY, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, HexCLocationX, HexCLocationX, 0, 0);
             Thread.Sleep(COLORCHANGEDELAY);
+            SendKeys.Send("^(a)");
+            Thread.Sleep(COLORCHANGEDELAY);
             SendKeys.Send("^(v)");
             Thread.Sleep(COLORCHANGEDELAY);
             SetCursorPos(DoneCLocationX, DoneCLocationY);
@@ -358,31 +360,49 @@ namespace RecRoomPainter {
         }
 
 
-        int NeighborLineDraw(List<List<int>> matrix, int x, int y, int changes, bool est) {
+        int NeighborLineDraw(List<List<int>> tMatrix, List<List<int>> matrix, int x, int y, int changes, bool est) {
 
-            int CheckNeighbor(int cx, int cy, int count) {
+            int CheckNeighbor(int cx, int cy, int count, int end) {
                 int relx = x + cx;
                 int rely = y + cy;
                 if (relx >= 0 && rely >= 0 && relx < matrix.Count && rely < matrix[0].Count) {
                     if (matrix[relx][rely] > 0) {
                         x = relx;
                         y = rely;
-                        return CheckNeighbor(cx, cy, count + 1);
+                        return CheckNeighbor(cx, cy, count + 1, count);
+                    }
+                    else if (tMatrix[relx][rely] == 0 && count > 0)
+                    {
+                        x = relx;
+                        y = rely;
+                        return CheckNeighbor(cx, cy, count + 1, end);
                     }
                 }
-                return count;
+                return end;
             }
             void DrawLine(int dirX, int dirY, int steps) {
                 changes += steps;
+                if (matrix[x][y] > 0)
+                {
+                    tMatrix[x][y] = 1;
+                }
                 matrix[x][y] = 0;
                 for (int i = 0; i < steps; i++) {
                     if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.Count && y + dirY < matrix[0].Count) {
                         x += dirX;
                         y += dirY;
+                        if (matrix[x][y] > 0)
+                        {
+                            tMatrix[x][y] = 1;
+                        }
                         matrix[x][y] = 0;
                     }
                 }
             }
+
+            DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
+            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), MOUSEDELAY / 2, est);
+
             while (true) {
                 if (!est) {
                     Application.DoEvents();
@@ -399,7 +419,7 @@ namespace RecRoomPainter {
 
 
                 for (int i = 0; i < dirCount.Length; i++) {
-                    dirCount[i] = CheckNeighbor(addXValues[i], addYValues[i], 0);
+                    dirCount[i] = CheckNeighbor(addXValues[i], addYValues[i], 0, 0);
                     x -= addXValues[i] * dirCount[i];
                     y -= addYValues[i] * dirCount[i];
                 }
@@ -422,6 +442,10 @@ namespace RecRoomPainter {
                     }
                     MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
                 }
+            }
+            if (changes > 0)
+            {
+                DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
             }
             return changes;
         }
@@ -475,19 +499,23 @@ namespace RecRoomPainter {
 
         }
 
+        void DrawSinglePixel(int xpos, int ypos, bool est)
+        {
+            for (int i = 0; i < 6; i++) {
+                LeftMouseDown(xpos, ypos, MOUSEDELAY / 2, est);
+                LeftMouseUp(xpos, ypos, 2, est);
+            }
+        }
 
-        int DrawPixel(List<List<int>> matrix, int px, int py, bool est) {
+        int DrawPixel(List<List<int>> tMatrix, List<List<int>> matrix, int px, int py, bool est) {
             int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
             int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
 
             LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
-            int changes = NeighborLineDraw(matrix, px, py, 0, est);
+            int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
             if (changes == 0) {
                 matrix[px][py] = 0;
-                for (int i = 0; i < 6; i++) {
-                    LeftMouseDown(xpos, ypos, MOUSEDELAY / 2, est);
-                    LeftMouseUp(xpos, ypos, 2, est);
-                }
+                tMatrix[px][py] = 0;
                 changes = 1;
             }
             LeftMouseUp(xpos, ypos, MOUSEDELAY / 2, est);
@@ -548,6 +576,19 @@ namespace RecRoomPainter {
                 }
 
                 List<List<int>> cMatrix = new List<List<int>>(imageModified.Width);
+                List<List<int>> tMatrix = new List<List<int>>(imageModified.Width);
+
+                // Initialize the 2D list with rows and columns filled with 0
+                for (int i = 0; i < imageModified.Width; i++)
+                {
+                    List<int> row = new List<int>(imageModified.Height);
+                    for (int j = 0; j < imageModified.Height; j++)
+                    {
+                        row.Add(0);
+                    }
+                    tMatrix.Add(row);
+                }
+
                 if (UserSettings.FillFirstLayer && c == 0) {
                     // Initialize the 2D list with rows and columns filled with 0
                     for (int i = 0; i < imageModified.Width; i++) {
@@ -574,7 +615,7 @@ namespace RecRoomPainter {
                                 return false;
                         }
                         if (cMatrix[i2][j2] >= 1) {
-                            DrawPixel(cMatrix, i2, j2, est);
+                            DrawPixel(tMatrix, cMatrix, i2, j2, est);
                         }
 
                     }
