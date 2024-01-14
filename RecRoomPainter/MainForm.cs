@@ -4,6 +4,7 @@ using KGySoft.Drawing.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -362,39 +363,32 @@ namespace RecRoomPainter {
 
         int NeighborLineDraw(List<List<int>> tMatrix, List<List<int>> matrix, int x, int y, int changes, bool est) {
 
-            int CheckNeighbor(int cx, int cy, int count, int end) {
+            int[] CheckNeighbor(int cx, int cy, int count, int end, int total) {
                 int relx = x + cx;
                 int rely = y + cy;
                 if (relx >= 0 && rely >= 0 && relx < matrix.Count && rely < matrix[0].Count) {
                     if (matrix[relx][rely] > 0) {
                         x = relx;
                         y = rely;
-                        return CheckNeighbor(cx, cy, count + 1, count);
+                        return CheckNeighbor(cx, cy, count + 1, total+1, total + 1);
                     }
-                    else if (tMatrix[relx][rely] == 0 && count > 0)
+                    else if (tMatrix[relx][rely] == 0)
                     {
                         x = relx;
                         y = rely;
-                        return CheckNeighbor(cx, cy, count + 1, end);
+                        return CheckNeighbor(cx, cy, count, end, total + 1);
                     }
                 }
-                return end;
+                int[] pack = { count, end, total };
+                return pack;
             }
             void DrawLine(int dirX, int dirY, int steps) {
                 changes += steps;
-                if (matrix[x][y] > 0)
-                {
-                    tMatrix[x][y] = 1;
-                }
                 matrix[x][y] = 0;
                 for (int i = 0; i < steps; i++) {
                     if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.Count && y + dirY < matrix[0].Count) {
                         x += dirX;
                         y += dirY;
-                        if (matrix[x][y] > 0)
-                        {
-                            tMatrix[x][y] = 1;
-                        }
                         matrix[x][y] = 0;
                     }
                 }
@@ -415,18 +409,23 @@ namespace RecRoomPainter {
 
                 int[] addXValues = { moveStep, 0, -moveStep, 0 };
                 int[] addYValues = { 0, moveStep, 0, -moveStep };
-                int[] dirCount = Enumerable.Repeat(0, addXValues.Length).ToArray();
+                int[] dirLength = Enumerable.Repeat(0, addXValues.Length).ToArray();
+                int[] pixCount = Enumerable.Repeat(0, addXValues.Length).ToArray();
 
 
-                for (int i = 0; i < dirCount.Length; i++) {
-                    dirCount[i] = CheckNeighbor(addXValues[i], addYValues[i], 0, 0);
-                    x -= addXValues[i] * dirCount[i];
-                    y -= addYValues[i] * dirCount[i];
+                for (int i = 0; i < addXValues.Length; i++) {
+                    int xSave = x;
+                    int ySave = y;
+                    int[] pack = CheckNeighbor(addXValues[i], addYValues[i], 0, 0, 0);
+                    dirLength[i] = pack[1];
+                    pixCount[i] = pack[0];
+                    x = xSave; 
+                    y = ySave;
                 }
 
-                int max = GetMaxDirIndex(dirCount);
+                int max = GetMaxDirIndex(pixCount);
 
-                if (dirCount[max] == 0) {
+                if (pixCount[max] == 0) {
                     break;
                 }
                 for (int i = 0; i < 5; i++) {
@@ -435,10 +434,10 @@ namespace RecRoomPainter {
                         speed = 20;
                     }
                     if (i % 2 == 1) {
-                        DrawLine(-addXValues[max], -addYValues[max], dirCount[max]);
+                        DrawLine(-addXValues[max], -addYValues[max], dirLength[max]);
                     }
                     else {
-                        DrawLine(addXValues[max], addYValues[max], dirCount[max]);
+                        DrawLine(addXValues[max], addYValues[max], dirLength[max]);
                     }
                     MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
                 }
@@ -515,7 +514,6 @@ namespace RecRoomPainter {
             int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
             if (changes == 0) {
                 matrix[px][py] = 0;
-                tMatrix[px][py] = 0;
                 changes = 1;
             }
             LeftMouseUp(xpos, ypos, MOUSEDELAY / 2, est);
@@ -568,26 +566,44 @@ namespace RecRoomPainter {
 
             Color[] pallet = ImageToPallet(imageModified);
 
+            List<List<int>> tMatrix = new List<List<int>>(imageModified.Width);
+
+            // Initialize the 2D list with rows and columns filled with 0
+            for (int i = 0; i < imageModified.Width; i++)
+            {
+                List<int> row = new List<int>(imageModified.Height);
+                for (int j = 0; j < imageModified.Height; j++)
+                {
+                    row.Add(0);
+                }
+                tMatrix.Add(row);
+            }
+
             for (int c = 0; c < pallet.Length; c++) {
                 float progress = (float)(c / (float)pallet.Length) * 100;
                 progressBar1.Value = (int)progress;
+
+
+                if (c > 0)
+                {
+                    for (int i = 0; i < imageModified.Width; i++)
+                    {
+                        for (int j = 0; j < imageModified.Height; j++)
+                        {
+                            if (imageModified.GetPixel(i, j) == pallet[c-1])
+                            {
+                                tMatrix[i][j] = 1;
+                            }
+                        }
+                    }
+                }
+
                 if (c < UserSettings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 0, 255)) {
                     continue;
                 }
 
                 List<List<int>> cMatrix = new List<List<int>>(imageModified.Width);
-                List<List<int>> tMatrix = new List<List<int>>(imageModified.Width);
 
-                // Initialize the 2D list with rows and columns filled with 0
-                for (int i = 0; i < imageModified.Width; i++)
-                {
-                    List<int> row = new List<int>(imageModified.Height);
-                    for (int j = 0; j < imageModified.Height; j++)
-                    {
-                        row.Add(0);
-                    }
-                    tMatrix.Add(row);
-                }
 
                 if (UserSettings.FillFirstLayer && c == 0) {
                     // Initialize the 2D list with rows and columns filled with 0
