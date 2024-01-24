@@ -15,9 +15,10 @@ namespace RecRoomPainter {
 
     public partial class MainForm : Form {
         public static ScalingMode scaleType = ScalingMode.Box;
+        public static ScalingMode processScaleType = ScalingMode.NearestNeighbor;
 
         const int MOUSEDELAY = 40;
-        const int COLORCHANGEDELAY = 4000;
+        int COLORCHANGEDELAY = 1000;
 
         public class UserSettingVars {
             public int DrawW {
@@ -66,6 +67,18 @@ namespace RecRoomPainter {
             public float PenSizeY {
                 get; set;
             }
+            public bool VectorMode
+            {
+                get; set;
+            }
+            public int SearchDepth
+            {
+                get; set;
+            }
+            public bool DirectDraw
+            {
+                get; set;
+            }
         }
 
         public static UserSettingVars UserSettings = new UserSettingVars {
@@ -84,6 +97,9 @@ namespace RecRoomPainter {
             DitherPattern = 0,
             PenSizeX = 1,
             PenSizeY = 1,
+            VectorMode = false,
+            SearchDepth = 1,
+            DirectDraw = false,
         };
 
 
@@ -181,9 +197,13 @@ namespace RecRoomPainter {
                 EnableControls(false);
                 progressBar1.Value = 0;
                 imageModified = (Bitmap)imageFile.Clone();
+<<<<<<< Updated upstream
                 imageModified = ResizeImage(imageFile, new Size(UserSettings.DrawW, UserSettings.DrawH), UserSettings.Pixelation);
-                progressBar1.Value = 10;
+=======
+                imageModified = BitmapExtensions.Resize(imageFile, new Size((int)Math.Round(UserSettings.DrawW * UserSettings.Pixelation), (int)Math.Round(UserSettings.DrawH * UserSettings.Pixelation)), processScaleType);
 
+>>>>>>> Stashed changes
+                progressBar1.Value = 10;
                 IDitherer dither = OrderedDitherer.Bayer2x2;
 
                 IQuantizer quantizer = OptimizedPaletteQuantizer.Wu(UserSettings.MaxColors);
@@ -268,6 +288,7 @@ namespace RecRoomPainter {
             }
         }
 
+<<<<<<< Updated upstream
 
 
         public static Bitmap ResizeImage(Bitmap imgToResize, Size size, double scale) {
@@ -277,11 +298,54 @@ namespace RecRoomPainter {
             }
             else {
                 return null;
+=======
+        int[] GetDirection(int startX, int startY, int endX, int endY)
+        {
+            int[] dir = { endX - startX, endY - startY };
+
+            if (dir[0] < 0)
+            {
+                dir[0] = -1;
+>>>>>>> Stashed changes
             }
+            else if (dir[0] > 0)
+            {
+                dir[0] = 1;
+            }
+
+            if (dir[1] < 0)
+            {
+                dir[1] = -1;
+            }
+            else if (dir[1] > 0)
+            {
+                dir[1] = 1;
+            }
+            return dir;
         }
 
+<<<<<<< Updated upstream
 
         public void SetPenColor(string hex) {
+=======
+        public void SetPenColor(string hex)
+        {
+            COLORCHANGEDELAY += 80;
+
+            bool UserForceQuit()
+            {
+                Application.DoEvents();
+                if (ModifierKeys == Keys.Alt)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+>>>>>>> Stashed changes
             Clipboard.SetText(hex);
 
             const int CCLocationX = 1334;
@@ -295,22 +359,46 @@ namespace RecRoomPainter {
 
             mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
             SetCursorPos(CCLocationX, CCLocationY);
             mouse_event(MOUSEEVENTF_LEFTDOWN, CCLocationX, CCLocationY, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, CCLocationX, CCLocationY, 0, 0);
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
             SetCursorPos(HexCLocationX, HexCLocationY);
             mouse_event(MOUSEEVENTF_LEFTDOWN, HexCLocationX, HexCLocationY, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, HexCLocationX, HexCLocationX, 0, 0);
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
             SendKeys.Send("^(a)");
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
             SendKeys.Send("^(v)");
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
             SetCursorPos(DoneCLocationX, DoneCLocationY);
             mouse_event(MOUSEEVENTF_LEFTDOWN, DoneCLocationX, DoneCLocationY, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, DoneCLocationX, DoneCLocationY, 0, 0);
+            if (UserForceQuit())
+            {
+                return;
+            }
             Thread.Sleep(COLORCHANGEDELAY);
         }
 
@@ -333,6 +421,7 @@ namespace RecRoomPainter {
             return maxIndex;
         }
 
+<<<<<<< Updated upstream
         List<List<int>> CoverageMatrix(Bitmap img, Color color) {
             List<List<int>> matrix = new List<List<int>>(img.Width);
 
@@ -345,34 +434,291 @@ namespace RecRoomPainter {
                     }
                     else {
                         row.Add(0);
+=======
+        int[,] CoverageMatrix(Bitmap img, Color color)
+        {
+            int[,] matrix = new int[img.Width, img.Height];
+
+            // Initialize the 2D array with values filled based on color match
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    if (img.GetPixel(i, j) == color)
+                    {
+                        matrix[i, j] = 1;
+                    }
+                    else
+                    {
+                        matrix[i, j] = 0;
+>>>>>>> Stashed changes
                     }
                 }
-                matrix.Add(row);
             }
             return matrix;
         }
 
+<<<<<<< Updated upstream
         void MoveMouse(int x, int y, int delay, bool estMode) {
             if (!estMode) {
+=======
+
+        void MoveMouse(int x, int y, int delay, bool estMode)
+        {
+            if (!estMode)
+            {
+>>>>>>> Stashed changes
                 SetCursorPos(x, y);
                 Thread.Sleep(delay);
             }
             estimatedTime += delay;
         }
 
+        bool OutOfBoundsCheck(int x, int y, int xLimit, int yLimit)
+        {
+            if (x >= xLimit || y >= yLimit ||
+                x < 0 || y < 0)
+            {
+                return true;
+            }
+            return false;
+        }
 
+<<<<<<< Updated upstream
         int NeighborLineDraw(List<List<int>> tMatrix, List<List<int>> matrix, int x, int y, int changes, bool est) {
+=======
+        int NeighborLineDraw2(List<List<int>> tMatrix, List<List<int>> matrix, int x, int y, bool est)
+        {
+
+            List<(int, int)> directions = new List<(int, int)>();
+
+            // Up
+            directions.Add((0, 1));
+
+            // Down
+            directions.Add((0, -1));
+
+            // Right
+            directions.Add((1, 0));
+
+            // Left
+            directions.Add((-1, 0));
+
+            if (UserSettings.VectorMode)
+            {
+                // TopRight
+                directions.Add((1, 1));
+
+                // BottomRight
+                directions.Add((1, -1));
+
+                // TopLeft
+                directions.Add((-1, 1));
+
+                // BottomLeft
+                directions.Add((-1, -1));
+            }
+
+            List<int[]> CreateMoveList(List<List<int>> mat, int startX, int startY)
+            {
+                List<int[]> list = new List<int[]>();
+
+                foreach ((int, int) dir in directions)
+                {
+                    int xNew = startX + dir.Item1;
+                    int yNew = startY + dir.Item2;
+
+                    while (true)
+                    {
+                        if (OutOfBoundsCheck(xNew, yNew, mat.Count, mat[0].Count))
+                        {
+                            break;
+                        }
+
+                        if (tMatrix[xNew][yNew] > 0)
+                        {
+                            break;
+                        }
+                        else if (mat[xNew][yNew] > 0)
+                        {
+                            list.Add(new int[] { xNew, yNew });
+                        }
+
+                        xNew += dir.Item1;
+                        yNew += dir.Item2;
+                    }
+                }
+
+                return list;
+            }
+
+
+            int PixelCount(List<List<int>> mat, int startX, int startY, int endX, int endY)
+            {
+                int[] dir = GetDirection(startX, startY, endX, endY);
+
+                int count = 0;
+
+                while (true)
+                {
+                    startX += dir[0];
+                    startY += dir[1];
+
+                    if (OutOfBoundsCheck(startX, startY, mat.Count, mat[0].Count))
+                    {
+                        break;
+                    }
+                    if (mat[startX][startY] > 0)
+                    {
+                        count++;
+                    }
+
+                    if (startX == endX && startY == endY)
+                    {
+                        break;
+                    }
+                }
+
+                return count;
+            }
+
+            int DrawLine(List<List<int>> mat, int startX, int startY, int endX, int endY)
+            {
+                int chan = 0;
+                int[] dir = GetDirection(startX, startY, endX, endY);
+
+                while (true)
+                {
+                    if (mat[startX][startY] > 0)
+                    {
+                        chan++;
+                    }
+                    mat[startX][startY] = 0;
+                    if (startX == endX && startY == endY)
+                    {
+                        break;
+                    }
+                    startX += dir[0];
+                    startY += dir[1];
+                    if (OutOfBoundsCheck(startX, startY, mat.Count, mat[0].Count))
+                    {
+                        break;
+                    }
+                }
+                return chan;
+            }
+
+            (List<int[]>, int) FindBestPath(List<List<int>> mat, int startX, int startY, int depth)
+            {
+                int[] bestPix = { 0, 0 };
+                int bestPixScore = 0;
+                List<int[]> bestPath = new List<int[]>();
+                int bestPathScore = 0;
+
+                List<int[]> possibleMoves = CreateMoveList(mat, startX, startY);
+
+                for (int i = 0; i < possibleMoves.Count; i++)
+                {
+
+
+                    if (depth + 1 < UserSettings.SearchDepth)
+                    {
+                        List<List<int>> tempmatrix = mat.Select(row => new List<int>(row)).ToList();
+
+                        int chan = DrawLine(tempmatrix, startX, startY, possibleMoves[i][0], possibleMoves[i][1]);
+
+                        if (chan > 0)
+                        {
+                            (List<int[]>, int) temp = FindBestPath(tempmatrix, possibleMoves[i][0], possibleMoves[i][1], depth + 1);
+                            if (temp.Item2 > bestPathScore)
+                            {
+                                bestPathScore = temp.Item2;
+                                bestPath = temp.Item1;
+                            }
+                        }
+
+                    }
+                    int current = PixelCount(mat, startX, startY, possibleMoves[i][0], possibleMoves[i][1]);
+                    if (current > bestPixScore)
+                    {
+                        bestPixScore = current;
+                        bestPix = possibleMoves[i];
+                    }
+                }
+                bestPath.Add(bestPix);
+                return (bestPath, bestPixScore + bestPathScore);
+            }
+
+
+            DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
+            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), MOUSEDELAY / 2, est);
+
+            int changes = 0;
+
+            while (true)
+            {
+                (List<int[]>, int) findPath = FindBestPath(matrix, x, y, 0);
+                List<int[]> path = findPath.Item1;
+                if (findPath.Item2 <= 0)
+                {
+                    break;
+                }
+
+                for (int p = 0; p < path.Count; p++)
+                {
+                    changes += DrawLine(matrix, x, y, path[p][0], path[p][1]);
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        int speed = 1;
+                        if (i == 4)
+                        {
+                            speed = 20;
+                        }
+                        if (i % 2 == 1)
+                        {
+                            MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
+                        }
+                        else
+                        {
+                            MoveMouse(UserSettings.DrawX + (int)Math.Round(path[p][0] * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(path[p][1] * UserSettings.PenSizeY), speed, est);
+                        }
+                    }
+                    x = path[p][0];
+                    y = path[p][1];
+                }
+            }
+            if (changes > 0)
+            {
+                DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
+            }
+
+            return changes;
+
+
+        }
+
+        int NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, int changes, bool est)
+        {
+>>>>>>> Stashed changes
 
             int[] CheckNeighbor(int cx, int cy, int count, int end, int total) {
                 int relx = x + cx;
                 int rely = y + cy;
+<<<<<<< Updated upstream
                 if (relx >= 0 && rely >= 0 && relx < matrix.Count && rely < matrix[0].Count) {
                     if (matrix[relx][rely] > 0) {
+=======
+                if (relx >= 0 && rely >= 0 && relx < matrix.GetLength(0) && rely < matrix.GetLength(1))
+                {
+                    if (matrix[relx, rely] > 0)
+                    {
+>>>>>>> Stashed changes
                         x = relx;
                         y = rely;
                         return CheckNeighbor(cx, cy, count + 1, total+1, total + 1);
                     }
-                    else if (tMatrix[relx][rely] == 0)
+                    else if (tMatrix[relx, rely] == 0 && !UserSettings.DirectDraw)
                     {
                         x = relx;
                         y = rely;
@@ -384,12 +730,20 @@ namespace RecRoomPainter {
             }
             void DrawLine(int dirX, int dirY, int steps) {
                 changes += steps;
+<<<<<<< Updated upstream
                 matrix[x][y] = 0;
                 for (int i = 0; i < steps; i++) {
                     if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.Count && y + dirY < matrix[0].Count) {
+=======
+                matrix[x, y] = 0;
+                for (int i = 0; i < steps; i++)
+                {
+                    if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.GetLength(0) && y + dirY < matrix.GetLength(1))
+                    {
+>>>>>>> Stashed changes
                         x += dirX;
                         y += dirY;
-                        matrix[x][y] = 0;
+                        matrix[x, y] = 0;
                     }
                 }
             }
@@ -405,15 +759,55 @@ namespace RecRoomPainter {
                     }
                 }
 
-                int moveStep = 1;
+                List<int> addXValues = new List<int>();
+                List<int> addYValues = new List<int>();
 
-                int[] addXValues = { moveStep, 0, -moveStep, 0 };
-                int[] addYValues = { 0, moveStep, 0, -moveStep };
-                int[] dirLength = Enumerable.Repeat(0, addXValues.Length).ToArray();
-                int[] pixCount = Enumerable.Repeat(0, addXValues.Length).ToArray();
+                //Up
+                addXValues.Add(0);
+                addYValues.Add(1);
+
+                //Down
+                addXValues.Add(0);
+                addYValues.Add(-1);
+
+                //Right
+                addXValues.Add(1);
+                addYValues.Add(0);
+
+                //Left
+                addXValues.Add(-1);
+                addYValues.Add(0);
+
+                if (UserSettings.VectorMode)
+                {
+                    //TopRight
+                    addXValues.Add(1);
+                    addYValues.Add(1);
+
+                    //BottomRight
+                    addXValues.Add(1);
+                    addYValues.Add(-1);
+
+                    //TopLeft
+                    addXValues.Add(-1);
+                    addYValues.Add(1);
+
+                    //BottomLeft
+                    addXValues.Add(-1);
+                    addYValues.Add(-1);
+
+                }
+
+                int[] dirLength = Enumerable.Repeat(0, addXValues.Capacity).ToArray();
+                int[] pixCount = Enumerable.Repeat(0, addXValues.Capacity).ToArray();
 
 
+<<<<<<< Updated upstream
                 for (int i = 0; i < addXValues.Length; i++) {
+=======
+                for (int i = 0; i < addXValues.Capacity; i++)
+                {
+>>>>>>> Stashed changes
                     int xSave = x;
                     int ySave = y;
                     int[] pack = CheckNeighbor(addXValues[i], addYValues[i], 0, 0, 0);
@@ -506,20 +900,32 @@ namespace RecRoomPainter {
             }
         }
 
+<<<<<<< Updated upstream
         int DrawPixel(List<List<int>> tMatrix, List<List<int>> matrix, int px, int py, bool est) {
+=======
+        int DrawPixel(int[,] tMatrix, int[,] matrix, int px, int py, bool est)
+        {
+>>>>>>> Stashed changes
             int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
             int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
 
             LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
             int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
+<<<<<<< Updated upstream
             if (changes == 0) {
                 matrix[px][py] = 0;
+=======
+            if (changes == 0)
+            {
+                matrix[px, py] = 0;
+>>>>>>> Stashed changes
                 changes = 1;
             }
             LeftMouseUp(xpos, ypos, MOUSEDELAY / 2, est);
             return changes;
         }
 
+<<<<<<< Updated upstream
         void CountEdgesMatrix(List<List<int>> matrix) {
 
             for (int i = 0; i < matrix.Count; i++) {
@@ -559,6 +965,13 @@ namespace RecRoomPainter {
 
         private bool Draw(bool est) {
             if (!est) {
+=======
+        private bool Draw(bool est)
+        {
+            COLORCHANGEDELAY = 1000;
+            if (!est)
+            {
+>>>>>>> Stashed changes
                 ActivateWindow("Rec Room");
                 Thread.Sleep(1000);
             }
@@ -566,17 +979,15 @@ namespace RecRoomPainter {
 
             Color[] pallet = ImageToPallet(imageModified);
 
-            List<List<int>> tMatrix = new List<List<int>>(imageModified.Width);
+            int[,] tMatrix = new int[imageModified.Width, imageModified.Height];
 
-            // Initialize the 2D list with rows and columns filled with 0
+            // Initialize the 2D array with values filled with 0
             for (int i = 0; i < imageModified.Width; i++)
             {
-                List<int> row = new List<int>(imageModified.Height);
                 for (int j = 0; j < imageModified.Height; j++)
                 {
-                    row.Add(0);
+                    tMatrix[i, j] = 0;
                 }
-                tMatrix.Add(row);
             }
 
             for (int c = 0; c < pallet.Length; c++) {
@@ -592,7 +1003,7 @@ namespace RecRoomPainter {
                         {
                             if (imageModified.GetPixel(i, j) == pallet[c-1])
                             {
-                                tMatrix[i][j] = 1;
+                                tMatrix[i, j] = 1;
                             }
                         }
                     }
@@ -602,6 +1013,7 @@ namespace RecRoomPainter {
                     continue;
                 }
 
+<<<<<<< Updated upstream
                 List<List<int>> cMatrix = new List<List<int>>(imageModified.Width);
 
 
@@ -611,8 +1023,21 @@ namespace RecRoomPainter {
                         List<int> row = new List<int>(imageModified.Height);
                         for (int j = 0; j < imageModified.Height; j++) {
                             row.Add(1);
+=======
+                List<int[]> pixelList = new List<int[]>(0);
+
+                int[,] cMatrix = new int[imageModified.Width, imageModified.Height];
+
+                if (UserSettings.FillFirstLayer && c == 0)
+                {
+                    // Initialize the 2D array with values filled with 1
+                    for (int i = 0; i < imageModified.Width; i++)
+                    {
+                        for (int j = 0; j < imageModified.Height; j++)
+                        {
+                            cMatrix[i, j] = 1;
+>>>>>>> Stashed changes
                         }
-                        cMatrix.Add(row);
                     }
                 }
                 else {
@@ -622,6 +1047,7 @@ namespace RecRoomPainter {
                 if (!est) {
                     SetPenColor($"{pallet[c].R:X2}{pallet[c].G:X2}{pallet[c].B:X2}");
                 }
+<<<<<<< Updated upstream
                 estimatedTime += COLORCHANGEDELAY * 5;
                 for (int i2 = 0; i2 < cMatrix.Count; i2++) {
                     for (int j2 = 0; j2 < cMatrix[i2].Count; j2++) {
@@ -629,6 +1055,20 @@ namespace RecRoomPainter {
                             Application.DoEvents();
                             if (ModifierKeys == Keys.Alt)
                                 return false;
+=======
+                estimatedTime += COLORCHANGEDELAY * 6;
+
+
+
+                for (int i2 = 0; i2 < cMatrix.GetLength(0); i2++)
+                {
+                    for (int j2 = 0; j2 < cMatrix.GetLength(1); j2++)
+                    {
+                        if (cMatrix[i2, j2] >= 1)
+                        {
+                            int[] row = { i2, j2 };
+                            pixelList.Add(row);
+>>>>>>> Stashed changes
                         }
                         if (cMatrix[i2][j2] >= 1) {
                             DrawPixel(tMatrix, cMatrix, i2, j2, est);
@@ -636,7 +1076,27 @@ namespace RecRoomPainter {
 
                     }
                 }
+<<<<<<< Updated upstream
                 if (!est) {
+=======
+
+                foreach (int[] p in pixelList)
+                {
+                    if (!est)
+                    {
+                        Application.DoEvents();
+                        if (ModifierKeys == Keys.Alt)
+                            return false;
+                    }
+                    if (cMatrix[p[0], p[1]] >= 1)
+                    {
+                        DrawPixel(tMatrix, cMatrix, p[0], p[1], est);
+                    }
+                }
+
+                if (!est)
+                {
+>>>>>>> Stashed changes
                     UserSettings.SkipColors = c;
                     UpdateUITextValues();
                 }
@@ -662,6 +1122,7 @@ namespace RecRoomPainter {
                 UserSettings.CropH = imageFile.Height;
                 UserSettings.CropX = 0;
                 UserSettings.CropY = 0;
+                UserSettings.DirectDraw = false;
                 UpdateUITextValues();
                 imageModified = imageFile;
                 ProcessImage();
@@ -823,7 +1284,6 @@ namespace RecRoomPainter {
 
         private void pixelateBar_Scroll(object sender, EventArgs e) {
             UserSettings.Pixelation = (double)pixelateBar.Value / 100;
-            Console.WriteLine(UserSettings.Pixelation);
         }
 
         private void pixelateBar_MouseCaptureChanged(object sender, EventArgs e) {
@@ -973,6 +1433,58 @@ namespace RecRoomPainter {
             UpdateUITextValues();
             if (imageModified != null)
                 ProcessImage();
+        }
+
+        private void bicubic_CheckedChanged(object sender, EventArgs e)
+        {
+
+            try
+            {
+                if (bicubicBox.Checked)
+                {
+                    processScaleType = ScalingMode.Bicubic;
+                }
+                else
+                {
+                    processScaleType = ScalingMode.NearestNeighbor;
+                }
+                ProcessImage();
+
+            }
+            catch (Exception)
+            {
+                processScaleType = ScalingMode.Box;
+            }
+
+        }
+
+        private void tableLayoutPanel21_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void vectorBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.VectorMode = vectorBox.Checked;
+            }
+            catch (Exception)
+            {
+                UserSettings.VectorMode = false;
+            }
+        }
+
+        private void directDrawBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.DirectDraw = directDrawBox.Checked;
+            }
+            catch (Exception)
+            {
+                UserSettings.DirectDraw = false;
+            }
         }
     }
 }
