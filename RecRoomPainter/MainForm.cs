@@ -790,6 +790,7 @@ namespace RecRoomPainter
 
                 for (int i = 0; i < addXValues.Capacity; i++)
                 {
+
                     int xSave = x;
                     int ySave = y;
                     int[] pack = CheckNeighbor(addXValues[i], addYValues[i], 0, 0, 0);
@@ -995,6 +996,11 @@ namespace RecRoomPainter
                 {
                     for (int j2 = 0; j2 < cMatrix.GetLength(1); j2++)
                     {
+                        Application.DoEvents();
+                        if (ModifierKeys == Keys.Alt)
+                        {
+                            goto stopdrawing;
+                        }
                         if (cMatrix[i2, j2] >= 1)
                         {
                             int[] row = { i2, j2 };
@@ -1033,6 +1039,7 @@ namespace RecRoomPainter
                 UserSettings.SkipColors = 0;
                 UpdateUITextValues();
             }
+            stopdrawing:
             return true;
         }
 

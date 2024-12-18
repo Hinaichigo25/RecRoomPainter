@@ -85,6 +85,7 @@
             this.tableLayoutPanel11 = new System.Windows.Forms.TableLayoutPanel();
             this.pixelateBar = new System.Windows.Forms.TrackBar();
             this.label5 = new System.Windows.Forms.Label();
+            this.directDrawBox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel20 = new System.Windows.Forms.TableLayoutPanel();
             this.firstLayerFill = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel17 = new System.Windows.Forms.TableLayoutPanel();
@@ -100,7 +101,6 @@
             this.tableLayoutPanel28 = new System.Windows.Forms.TableLayoutPanel();
             this.bicubicBox = new System.Windows.Forms.CheckBox();
             this.vectorBox = new System.Windows.Forms.CheckBox();
-            this.directDrawBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -920,6 +920,18 @@
             this.label5.Text = "Pixelate";
             this.label5.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // directDrawBox
+            // 
+            this.directDrawBox.AutoSize = true;
+            this.directDrawBox.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.directDrawBox.Location = new System.Drawing.Point(253, 3);
+            this.directDrawBox.Name = "directDrawBox";
+            this.directDrawBox.Size = new System.Drawing.Size(80, 34);
+            this.directDrawBox.TabIndex = 31;
+            this.directDrawBox.Text = "Direct Draw";
+            this.directDrawBox.UseVisualStyleBackColor = true;
+            this.directDrawBox.CheckedChanged += new System.EventHandler(this.directDrawBox_CheckedChanged);
+            // 
             // tableLayoutPanel20
             // 
             this.tableLayoutPanel20.ColumnCount = 1;
@@ -1083,7 +1095,7 @@
             "SierraLite",
             "StevensonArce",
             "Stucki"});
-            this.ditherBox.Location = new System.Drawing.Point(53, 5);
+            this.ditherBox.Location = new System.Drawing.Point(53, 4);
             this.ditherBox.Name = "ditherBox";
             this.ditherBox.Size = new System.Drawing.Size(144, 24);
             this.ditherBox.TabIndex = 26;
@@ -1138,18 +1150,6 @@
             this.vectorBox.Text = "Vector Mode";
             this.vectorBox.UseVisualStyleBackColor = true;
             this.vectorBox.CheckedChanged += new System.EventHandler(this.vectorBox_CheckedChanged);
-            // 
-            // directDrawBox
-            // 
-            this.directDrawBox.AutoSize = true;
-            this.directDrawBox.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.directDrawBox.Location = new System.Drawing.Point(253, 3);
-            this.directDrawBox.Name = "directDrawBox";
-            this.directDrawBox.Size = new System.Drawing.Size(80, 34);
-            this.directDrawBox.TabIndex = 31;
-            this.directDrawBox.Text = "Direct Draw";
-            this.directDrawBox.UseVisualStyleBackColor = true;
-            this.directDrawBox.CheckedChanged += new System.EventHandler(this.directDrawBox_CheckedChanged);
             // 
             // MainForm
             // 
