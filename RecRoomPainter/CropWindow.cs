@@ -3,8 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace RecRoomPainter {
-    public partial class CropWindow : Form {
+namespace RecRoomPainter
+{
+    public partial class CropWindow : Form
+    {
 
 
         Point newCropXY = new Point(0, 0);
@@ -14,7 +16,8 @@ namespace RecRoomPainter {
 
 
         int state = 0;
-        public CropWindow(MouseEventArgs mouse) {
+        public CropWindow(MouseEventArgs mouse)
+        {
             InitializeComponent();
             this.instruct.Text = "Set First Point!";
             oldCropXY.X = 0;
@@ -24,9 +27,11 @@ namespace RecRoomPainter {
 
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e) {
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
             MouseEventArgs mouse = e as MouseEventArgs;
-            switch (state) {
+            switch (state)
+            {
                 case 0:
                     newCropXY = new Point(mouse.Location.X + 10, mouse.Location.Y + 20);
                     this.instruct.Text = "Set Second Point!";
@@ -47,11 +52,13 @@ namespace RecRoomPainter {
 
         }
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e) {
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
 
         }
 
-        private void AcceptButton_Click(object sender, EventArgs e) {
+        private void AcceptButton_Click(object sender, EventArgs e)
+        {
 
             MainForm.UserSettings.CropX = newCropXY.X;
             MainForm.UserSettings.CropY = newCropXY.Y;
@@ -60,9 +67,11 @@ namespace RecRoomPainter {
 
 
             Form mainForm = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
-            if (mainForm != null) {
+            if (mainForm != null)
+            {
                 // If the main form is minimized, restore it
-                if (mainForm.WindowState == FormWindowState.Minimized) {
+                if (mainForm.WindowState == FormWindowState.Minimized)
+                {
                     mainForm.WindowState = FormWindowState.Normal;
                 }
 
@@ -72,16 +81,19 @@ namespace RecRoomPainter {
             this.Close();
         }
 
-        private void CancelButton_Click(object sender, EventArgs e) {
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
             MainForm.UserSettings.CropX = oldCropXY.X;
             MainForm.UserSettings.CropY = oldCropXY.Y;
             MainForm.UserSettings.CropH = oldCropWH.Height;
             MainForm.UserSettings.CropW = oldCropWH.Width;
 
             Form mainForm = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
-            if (mainForm != null) {
+            if (mainForm != null)
+            {
                 // If the main form is minimized, restore it
-                if (mainForm.WindowState == FormWindowState.Minimized) {
+                if (mainForm.WindowState == FormWindowState.Minimized)
+                {
                     mainForm.WindowState = FormWindowState.Normal;
                 }
 
@@ -92,15 +104,18 @@ namespace RecRoomPainter {
             this.Close();
         }
 
-        private void CropWindow_Load(object sender, EventArgs e) {
+        private void CropWindow_Load(object sender, EventArgs e)
+        {
 
         }
 
-        private void label1_Click(object sender, EventArgs e) {
+        private void label1_Click(object sender, EventArgs e)
+        {
 
         }
 
-        private void ResetButton_Click(object sender, EventArgs e) {
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
             state = 0;
             this.instruct.Text = "Set First Point!";
             MainForm.UserSettings.CropX = oldCropXY.X;

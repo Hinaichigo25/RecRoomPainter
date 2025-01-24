@@ -1,7 +1,4 @@
-﻿using KGySoft.CoreLibraries;
-using KGySoft.Drawing;
-using KGySoft.Drawing.Imaging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using KGySoft.CoreLibraries;
+using KGySoft.Drawing;
+using KGySoft.Drawing.Imaging;
 
 namespace RecRoomPainter
 {
@@ -76,6 +76,11 @@ namespace RecRoomPainter
             {
                 get; set;
             }
+            public int QuantType
+            {
+                get; set;
+            }
+
             public float PenSizeX
             {
                 get; set;
@@ -85,10 +90,6 @@ namespace RecRoomPainter
                 get; set;
             }
             public bool VectorMode
-            {
-                get; set;
-            }
-            public int SearchDepth
             {
                 get; set;
             }
@@ -113,10 +114,10 @@ namespace RecRoomPainter
             SkipColors = 0,
             FillFirstLayer = false,
             DitherPattern = 0,
+            QuantType = 0,
             PenSizeX = 1,
             PenSizeY = 1,
             VectorMode = false,
-            SearchDepth = 1,
             DirectDraw = false,
         };
 
@@ -186,6 +187,7 @@ namespace RecRoomPainter
             maxColorsBox.Enabled = enable;
             firstLayerFill.Enabled = enable;
             ditherBox.Enabled = enable;
+            quantBox.Enabled = enable;
             startButton.Enabled = enable;
             clearButton.Enabled = enable;
             XBox.Enabled = enable;
@@ -228,12 +230,19 @@ namespace RecRoomPainter
                 progressBar1.Value = 10;
                 IDitherer dither = OrderedDitherer.Bayer2x2;
 
-                IQuantizer quantizer = OptimizedPaletteQuantizer.Wu(UserSettings.MaxColors);
-                switch (UserSettings.DitherPattern)
+                IQuantizer quantizer = OptimizedPaletteQuantizer.MedianCut(UserSettings.MaxColors);
+                switch (UserSettings.QuantType)
                 {
                     case 1:
-                        dither = OrderedDitherer.Bayer2x2;
+                        quantizer = OptimizedPaletteQuantizer.Wu(UserSettings.MaxColors);
                         break;
+                    case 2:
+                        quantizer = OptimizedPaletteQuantizer.Octree(UserSettings.MaxColors);
+                        break;
+                }
+
+                switch (UserSettings.DitherPattern)
+                {
                     case 2:
                         dither = OrderedDitherer.Bayer3x3;
                         break;
@@ -286,7 +295,7 @@ namespace RecRoomPainter
                     imageModified = imageModified.ConvertPixelFormat(PixelFormat.Format32bppArgb, quantizer);
                 }
                 progressBar1.Value = 50;
-                imageModified = BitmapExtensions.Resize(imageModified, imageFile.Size, ScalingMode.NearestNeighbor);
+                //imageModified = BitmapExtensions.Resize(imageModified, imageFile.Size, ScalingMode.NearestNeighbor);
                 imageModified = CropImageSet(imageModified);
                 imageModified = BitmapExtensions.Resize(imageModified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSizeX), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSizeY)), ScalingMode.NearestNeighbor);
                 SetPreview();
@@ -315,30 +324,6 @@ namespace RecRoomPainter
             {
                 MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Drawing Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
-        }
-
-        int[] GetDirection(int startX, int startY, int endX, int endY)
-        {
-            int[] dir = { endX - startX, endY - startY };
-
-            if (dir[0] < 0)
-            {
-                dir[0] = -1;
-            }
-            else if (dir[0] > 0)
-            {
-                dir[0] = 1;
-            }
-
-            if (dir[1] < 0)
-            {
-                dir[1] = -1;
-            }
-            else if (dir[1] > 0)
-            {
-                dir[1] = 1;
-            }
-            return dir;
         }
 
         public void SetPenColor(string hex)
@@ -468,227 +453,6 @@ namespace RecRoomPainter
                 Thread.Sleep(delay);
             }
             estimatedTime += delay;
-        }
-
-        bool OutOfBoundsCheck(int x, int y, int xLimit, int yLimit)
-        {
-            if (x >= xLimit || y >= yLimit ||
-                x < 0 || y < 0)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        int NeighborLineDraw2(List<List<int>> tMatrix, List<List<int>> matrix, int x, int y, bool est)
-        {
-
-            List<(int, int)> directions = new List<(int, int)>();
-
-            // Up
-            directions.Add((0, 1));
-
-            // Down
-            directions.Add((0, -1));
-
-            // Right
-            directions.Add((1, 0));
-
-            // Left
-            directions.Add((-1, 0));
-
-            if (UserSettings.VectorMode)
-            {
-                // TopRight
-                directions.Add((1, 1));
-
-                // BottomRight
-                directions.Add((1, -1));
-
-                // TopLeft
-                directions.Add((-1, 1));
-
-                // BottomLeft
-                directions.Add((-1, -1));
-            }
-
-            List<int[]> CreateMoveList(List<List<int>> mat, int startX, int startY)
-            {
-                List<int[]> list = new List<int[]>();
-
-                foreach ((int, int) dir in directions)
-                {
-                    int xNew = startX + dir.Item1;
-                    int yNew = startY + dir.Item2;
-
-                    while (true)
-                    {
-                        if (OutOfBoundsCheck(xNew, yNew, mat.Count, mat[0].Count))
-                        {
-                            break;
-                        }
-
-                        if (tMatrix[xNew][yNew] > 0)
-                        {
-                            break;
-                        }
-                        else if (mat[xNew][yNew] > 0)
-                        {
-                            list.Add(new int[] { xNew, yNew });
-                        }
-
-                        xNew += dir.Item1;
-                        yNew += dir.Item2;
-                    }
-                }
-
-                return list;
-            }
-
-
-            int PixelCount(List<List<int>> mat, int startX, int startY, int endX, int endY)
-            {
-                int[] dir = GetDirection(startX, startY, endX, endY);
-
-                int count = 0;
-
-                while (true)
-                {
-                    startX += dir[0];
-                    startY += dir[1];
-
-                    if (OutOfBoundsCheck(startX, startY, mat.Count, mat[0].Count))
-                    {
-                        break;
-                    }
-                    if (mat[startX][startY] > 0)
-                    {
-                        count++;
-                    }
-
-                    if (startX == endX && startY == endY)
-                    {
-                        break;
-                    }
-                }
-
-                return count;
-            }
-
-            int DrawLine(List<List<int>> mat, int startX, int startY, int endX, int endY)
-            {
-                int chan = 0;
-                int[] dir = GetDirection(startX, startY, endX, endY);
-
-                while (true)
-                {
-                    if (mat[startX][startY] > 0)
-                    {
-                        chan++;
-                    }
-                    mat[startX][startY] = 0;
-                    if (startX == endX && startY == endY)
-                    {
-                        break;
-                    }
-                    startX += dir[0];
-                    startY += dir[1];
-                    if (OutOfBoundsCheck(startX, startY, mat.Count, mat[0].Count))
-                    {
-                        break;
-                    }
-                }
-                return chan;
-            }
-
-            (List<int[]>, int) FindBestPath(List<List<int>> mat, int startX, int startY, int depth)
-            {
-                int[] bestPix = { 0, 0 };
-                int bestPixScore = 0;
-                List<int[]> bestPath = new List<int[]>();
-                int bestPathScore = 0;
-
-                List<int[]> possibleMoves = CreateMoveList(mat, startX, startY);
-
-                for (int i = 0; i < possibleMoves.Count; i++)
-                {
-
-
-                    if (depth + 1 < UserSettings.SearchDepth)
-                    {
-                        List<List<int>> tempmatrix = mat.Select(row => new List<int>(row)).ToList();
-
-                        int chan = DrawLine(tempmatrix, startX, startY, possibleMoves[i][0], possibleMoves[i][1]);
-
-                        if (chan > 0)
-                        {
-                            (List<int[]>, int) temp = FindBestPath(tempmatrix, possibleMoves[i][0], possibleMoves[i][1], depth + 1);
-                            if (temp.Item2 > bestPathScore)
-                            {
-                                bestPathScore = temp.Item2;
-                                bestPath = temp.Item1;
-                            }
-                        }
-
-                    }
-                    int current = PixelCount(mat, startX, startY, possibleMoves[i][0], possibleMoves[i][1]);
-                    if (current > bestPixScore)
-                    {
-                        bestPixScore = current;
-                        bestPix = possibleMoves[i];
-                    }
-                }
-                bestPath.Add(bestPix);
-                return (bestPath, bestPixScore + bestPathScore);
-            }
-
-
-            DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
-            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), MOUSEDELAY / 2, est);
-
-            int changes = 0;
-
-            while (true)
-            {
-                (List<int[]>, int) findPath = FindBestPath(matrix, x, y, 0);
-                List<int[]> path = findPath.Item1;
-                if (findPath.Item2 <= 0)
-                {
-                    break;
-                }
-
-                for (int p = 0; p < path.Count; p++)
-                {
-                    changes += DrawLine(matrix, x, y, path[p][0], path[p][1]);
-
-                    for (int i = 0; i < 5; i++)
-                    {
-                        int speed = 1;
-                        if (i == 4)
-                        {
-                            speed = 20;
-                        }
-                        if (i % 2 == 1)
-                        {
-                            MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
-                        }
-                        else
-                        {
-                            MoveMouse(UserSettings.DrawX + (int)Math.Round(path[p][0] * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(path[p][1] * UserSettings.PenSizeY), speed, est);
-                        }
-                    }
-                    x = path[p][0];
-                    y = path[p][1];
-                }
-            }
-            if (changes > 0)
-            {
-                DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
-            }
-
-            return changes;
-
-
         }
 
         int NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, int changes, bool est)
@@ -1039,7 +803,7 @@ namespace RecRoomPainter
                 UserSettings.SkipColors = 0;
                 UpdateUITextValues();
             }
-            stopdrawing:
+        stopdrawing:
             return true;
         }
 
@@ -1258,7 +1022,7 @@ namespace RecRoomPainter
 
         private void pixelateBar_Scroll(object sender, EventArgs e)
         {
-            UserSettings.Pixelation = (double)pixelateBar.Value / 100;
+            UserSettings.Pixelation = Math.Pow(0.5, pixelateBar.Value - 1);
         }
 
         private void pixelateBar_MouseCaptureChanged(object sender, EventArgs e)
@@ -1492,6 +1256,20 @@ namespace RecRoomPainter
             catch (Exception)
             {
                 UserSettings.DirectDraw = false;
+            }
+        }
+
+        private void quantBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+
+                UserSettings.QuantType = quantBox.SelectedIndex;
+                ProcessImage();
+            }
+            catch (Exception)
+            {
+                UserSettings.QuantType = 0;
             }
         }
     }
