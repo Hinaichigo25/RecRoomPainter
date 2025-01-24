@@ -1007,10 +1007,16 @@ namespace RecRoomPainter
             {
                 UserSettings.MaxColors = Convert.ToInt32(maxColorsBox.Text);
                 UserSettings.MaxColors = int.Parse(maxColorsBox.Text);
+                if (UserSettings.MaxColors < 2)
+                {
+                    UserSettings.MaxColors = 2;
+                    maxColorsBox.Text = "2";
+                }
+
             }
             catch (Exception)
             {
-                UserSettings.MaxColors = 1;
+                UserSettings.MaxColors = 2;
             }
             ProcessImage();
         }
