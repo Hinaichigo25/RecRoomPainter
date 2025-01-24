@@ -81,11 +81,7 @@ namespace RecRoomPainter
                 get; set;
             }
 
-            public float PenSizeX
-            {
-                get; set;
-            }
-            public float PenSizeY
+            public float PenSize
             {
                 get; set;
             }
@@ -115,8 +111,7 @@ namespace RecRoomPainter
             FillFirstLayer = false,
             DitherPattern = 0,
             QuantType = 0,
-            PenSizeX = 1,
-            PenSizeY = 1,
+            PenSize = 4,
             VectorMode = false,
             DirectDraw = false,
         };
@@ -193,7 +188,6 @@ namespace RecRoomPainter
             XBox.Enabled = enable;
             YBox.Enabled = enable;
             GapXBox.Enabled = enable;
-            GapYBox.Enabled = enable;
             CropButton.Enabled = enable;
             CropHBox.Enabled = enable;
             CropWBox.Enabled = enable;
@@ -209,8 +203,7 @@ namespace RecRoomPainter
             maxColorsBox.Text = UserSettings.MaxColors.ToString();
             XBox.Text = UserSettings.DrawX.ToString();
             YBox.Text = UserSettings.DrawY.ToString();
-            GapXBox.Text = (UserSettings.PenSizeX - 1).ToString();
-            GapYBox.Text = (UserSettings.PenSizeY - 1).ToString();
+            GapXBox.Text = (UserSettings.PenSize - 1).ToString();
             CropHBox.Text = UserSettings.CropH.ToString();
             CropWBox.Text = UserSettings.CropW.ToString();
             CropXBox.Text = UserSettings.CropX.ToString();
@@ -297,7 +290,7 @@ namespace RecRoomPainter
                 progressBar1.Value = 50;
                 //imageModified = BitmapExtensions.Resize(imageModified, imageFile.Size, ScalingMode.NearestNeighbor);
                 imageModified = CropImageSet(imageModified);
-                imageModified = BitmapExtensions.Resize(imageModified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSizeX), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSizeY)), ScalingMode.NearestNeighbor);
+                imageModified = BitmapExtensions.Resize(imageModified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSize), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSize)), ScalingMode.NearestNeighbor);
                 SetPreview();
 
                 progressBar1.Value = 100;
@@ -495,8 +488,8 @@ namespace RecRoomPainter
                 }
             }
 
-            DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
-            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), MOUSEDELAY / 2, est);
+            DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), est);
+            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), MOUSEDELAY / 2, est);
 
             while (true)
             {
@@ -585,12 +578,12 @@ namespace RecRoomPainter
                     {
                         DrawLine(addXValues[max], addYValues[max], dirLength[max]);
                     }
-                    MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), speed, est);
+                    MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), speed, est);
                 }
             }
             if (changes > 0)
             {
-                DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSizeX), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSizeY), est);
+                DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), est);
             }
             return changes;
         }
@@ -666,8 +659,8 @@ namespace RecRoomPainter
 
         int DrawPixel(int[,] tMatrix, int[,] matrix, int px, int py, bool est)
         {
-            int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSizeX);
-            int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSizeY);
+            int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSize);
+            int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSize);
 
             LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
             int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
@@ -920,7 +913,7 @@ namespace RecRoomPainter
         public void SetPreview()
         {
             imagePreview = (Bitmap)imageModified.Clone();
-            pictureBox1.Image = BitmapExtensions.Resize(imagePreview, new Size((int)Math.Round(imagePreview.Width * UserSettings.PenSizeX), (int)Math.Round(imagePreview.Height * UserSettings.PenSizeY)), scaleType, true);
+            pictureBox1.Image = BitmapExtensions.Resize(imagePreview, new Size((int)Math.Round(imagePreview.Width * UserSettings.PenSize), (int)Math.Round(imagePreview.Height * UserSettings.PenSize)), scaleType, true);
         }
 
         private void estButton_Click(object sender, EventArgs e)
@@ -975,29 +968,16 @@ namespace RecRoomPainter
             ProcessImage();
         }
 
-        private void GapYBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                UserSettings.PenSizeY = (float)Convert.ToDouble(GapYBox.Text) + 1;
-                UserSettings.PenSizeY = float.Parse(GapYBox.Text) + 1;
-            }
-            catch (Exception)
-            {
-                UserSettings.PenSizeY = 1;
-            }
-        }
-
         private void GapXBox_Leave(object sender, EventArgs e)
         {
             try
             {
-                UserSettings.PenSizeX = (float)Convert.ToDouble(GapXBox.Text) + 1;
-                UserSettings.PenSizeX = float.Parse(GapXBox.Text) + 1;
+                UserSettings.PenSize = (float)Convert.ToDouble(GapXBox.Text) + 1;
+                UserSettings.PenSize = float.Parse(GapXBox.Text) + 1;
             }
             catch (Exception)
             {
-                UserSettings.PenSizeX = 1;
+                UserSettings.PenSize = 1;
             }
         }
 
