@@ -1062,6 +1062,8 @@ namespace RecRoomPainter
                         int newy = m.Size.Height - sizeOffset;
                         UserSettings.DrawW = newx;
                         UserSettings.DrawH = newy;
+                        UserSettings.CropW = newx;
+                        UserSettings.CropH = newy;
                         UpdateUITextValues();
                         ProcessImage();
                         m.UpdateImage(imagePreview);

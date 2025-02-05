@@ -31,7 +31,15 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.startButton = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.estButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.estTimeLabel = new System.Windows.Forms.Label();
+            this.estTime = new System.Windows.Forms.Label();
             this.clearButton = new System.Windows.Forms.Button();
             this.uploadButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
@@ -51,6 +59,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.heightInput = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel12 = new System.Windows.Forms.TableLayoutPanel();
+            this.GapXBox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.tableLayoutPanel22 = new System.Windows.Forms.TableLayoutPanel();
             this.CropButton = new System.Windows.Forms.Button();
@@ -68,6 +77,7 @@
             this.CropHlabel = new System.Windows.Forms.Label();
             this.CropHBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel21 = new System.Windows.Forms.TableLayoutPanel();
+            this.vectorBox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel30 = new System.Windows.Forms.TableLayoutPanel();
             this.quantBox = new System.Windows.Forms.ComboBox();
             this.label10 = new System.Windows.Forms.Label();
@@ -75,6 +85,7 @@
             this.tableLayoutPanel16 = new System.Windows.Forms.TableLayoutPanel();
             this.pixelateBar = new System.Windows.Forms.TrackBar();
             this.label5 = new System.Windows.Forms.Label();
+            this.directDrawBox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel20 = new System.Windows.Forms.TableLayoutPanel();
             this.firstLayerFill = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel17 = new System.Windows.Forms.TableLayoutPanel();
@@ -89,19 +100,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tableLayoutPanel31 = new System.Windows.Forms.TableLayoutPanel();
             this.bicubicBox = new System.Windows.Forms.CheckBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.GapXBox = new System.Windows.Forms.TextBox();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.startButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.estButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
-            this.estTimeLabel = new System.Windows.Forms.Label();
-            this.estTime = new System.Windows.Forms.Label();
-            this.vectorBox = new System.Windows.Forms.CheckBox();
-            this.directDrawBox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             this.tableLayoutPanel7.SuspendLayout();
@@ -127,9 +130,6 @@
             this.tableLayoutPanel19.SuspendLayout();
             this.tableLayoutPanel28.SuspendLayout();
             this.tableLayoutPanel31.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -158,6 +158,43 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(955, 607);
             this.tableLayoutPanel1.TabIndex = 3;
             // 
+            // startButton
+            // 
+            this.startButton.AutoSize = true;
+            this.startButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.startButton.Enabled = false;
+            this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.startButton.Location = new System.Drawing.Point(406, 573);
+            this.startButton.Margin = new System.Windows.Forms.Padding(6);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(543, 28);
+            this.startButton.TabIndex = 38;
+            this.startButton.Text = "START";
+            this.startButton.Click += new System.EventHandler(this.StartButton_Click);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.progressBar1.Location = new System.Drawing.Point(3, 570);
+            this.progressBar1.MarqueeAnimationSpeed = 50;
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(394, 34);
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.TabIndex = 37;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(402, 2);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(551, 563);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 36;
+            this.pictureBox1.TabStop = false;
+            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.AutoSize = true;
@@ -181,6 +218,71 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(394, 561);
             this.tableLayoutPanel2.TabIndex = 3;
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 99.99999F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 250F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel3.Controls.Add(this.estButton, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel4, 1, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 385);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(388, 32);
+            this.tableLayoutPanel3.TabIndex = 34;
+            // 
+            // estButton
+            // 
+            this.estButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.estButton.Location = new System.Drawing.Point(291, 3);
+            this.estButton.Name = "estButton";
+            this.estButton.Size = new System.Drawing.Size(94, 26);
+            this.estButton.TabIndex = 26;
+            this.estButton.Text = "Estimate";
+            this.estButton.UseVisualStyleBackColor = true;
+            this.estButton.Click += new System.EventHandler(this.estButton_Click);
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 2;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 90F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.estTimeLabel, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.estTime, 1, 0);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(41, 3);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 1;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(244, 26);
+            this.tableLayoutPanel4.TabIndex = 27;
+            // 
+            // estTimeLabel
+            // 
+            this.estTimeLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.estTimeLabel.AutoSize = true;
+            this.estTimeLabel.Location = new System.Drawing.Point(7, 5);
+            this.estTimeLabel.Name = "estTimeLabel";
+            this.estTimeLabel.Size = new System.Drawing.Size(75, 16);
+            this.estTimeLabel.TabIndex = 24;
+            this.estTimeLabel.Text = "Draw Time:";
+            // 
+            // estTime
+            // 
+            this.estTime.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.estTime.AutoSize = true;
+            this.estTime.Location = new System.Drawing.Point(111, 5);
+            this.estTime.Name = "estTime";
+            this.estTime.Size = new System.Drawing.Size(112, 16);
+            this.estTime.TabIndex = 23;
+            this.estTime.Text = "D00:H00:M00:S00";
+            this.estTime.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // clearButton
             // 
@@ -454,6 +556,20 @@
             this.tableLayoutPanel12.Size = new System.Drawing.Size(57, 91);
             this.tableLayoutPanel12.TabIndex = 31;
             // 
+            // GapXBox
+            // 
+            this.GapXBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GapXBox.Enabled = false;
+            this.GapXBox.Location = new System.Drawing.Point(2, 27);
+            this.GapXBox.Margin = new System.Windows.Forms.Padding(2);
+            this.GapXBox.MaxLength = 10;
+            this.GapXBox.Name = "GapXBox";
+            this.GapXBox.Size = new System.Drawing.Size(53, 22);
+            this.GapXBox.TabIndex = 18;
+            this.GapXBox.Text = "3.0";
+            this.GapXBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.GapXBox.Leave += new System.EventHandler(this.GapXBox_Leave);
+            // 
             // label9
             // 
             this.label9.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -685,6 +801,18 @@
             this.tableLayoutPanel21.Size = new System.Drawing.Size(388, 194);
             this.tableLayoutPanel21.TabIndex = 33;
             // 
+            // vectorBox
+            // 
+            this.vectorBox.AutoSize = true;
+            this.vectorBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vectorBox.Location = new System.Drawing.Point(203, 159);
+            this.vectorBox.Name = "vectorBox";
+            this.vectorBox.Size = new System.Drawing.Size(182, 32);
+            this.vectorBox.TabIndex = 39;
+            this.vectorBox.Text = "Vector Mode";
+            this.vectorBox.UseVisualStyleBackColor = true;
+            this.vectorBox.CheckedChanged += new System.EventHandler(this.vectorBox_CheckedChanged);
+            // 
             // tableLayoutPanel30
             // 
             this.tableLayoutPanel30.ColumnCount = 2;
@@ -783,6 +911,17 @@
             this.label5.TabIndex = 3;
             this.label5.Text = "Pixelate";
             this.label5.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // directDrawBox
+            // 
+            this.directDrawBox.AutoSize = true;
+            this.directDrawBox.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.directDrawBox.Location = new System.Drawing.Point(3, 75);
+            this.directDrawBox.Name = "directDrawBox";
+            this.directDrawBox.Size = new System.Drawing.Size(80, 34);
+            this.directDrawBox.TabIndex = 33;
+            this.directDrawBox.Text = "Direct Draw";
+            this.directDrawBox.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel20
             // 
@@ -991,145 +1130,6 @@
             this.bicubicBox.UseVisualStyleBackColor = true;
             this.bicubicBox.CheckedChanged += new System.EventHandler(this.bicubic_CheckedChanged);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(402, 2);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(551, 563);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 36;
-            this.pictureBox1.TabStop = false;
-            // 
-            // GapXBox
-            // 
-            this.GapXBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GapXBox.Enabled = false;
-            this.GapXBox.Location = new System.Drawing.Point(2, 27);
-            this.GapXBox.Margin = new System.Windows.Forms.Padding(2);
-            this.GapXBox.MaxLength = 10;
-            this.GapXBox.Name = "GapXBox";
-            this.GapXBox.Size = new System.Drawing.Size(53, 22);
-            this.GapXBox.TabIndex = 18;
-            this.GapXBox.Text = "3.0";
-            this.GapXBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.GapXBox.Leave += new System.EventHandler(this.GapXBox_Leave);
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.progressBar1.Location = new System.Drawing.Point(3, 570);
-            this.progressBar1.MarqueeAnimationSpeed = 50;
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(394, 34);
-            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar1.TabIndex = 37;
-            // 
-            // startButton
-            // 
-            this.startButton.AutoSize = true;
-            this.startButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.startButton.Enabled = false;
-            this.startButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.startButton.Location = new System.Drawing.Point(406, 573);
-            this.startButton.Margin = new System.Windows.Forms.Padding(6);
-            this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(543, 28);
-            this.startButton.TabIndex = 38;
-            this.startButton.Text = "START";
-            this.startButton.Click += new System.EventHandler(this.StartButton_Click);
-            // 
-            // tableLayoutPanel3
-            // 
-            this.tableLayoutPanel3.ColumnCount = 3;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 99.99999F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 250F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tableLayoutPanel3.Controls.Add(this.estButton, 2, 0);
-            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel4, 1, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 385);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(388, 32);
-            this.tableLayoutPanel3.TabIndex = 34;
-            // 
-            // estButton
-            // 
-            this.estButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.estButton.Location = new System.Drawing.Point(291, 3);
-            this.estButton.Name = "estButton";
-            this.estButton.Size = new System.Drawing.Size(94, 26);
-            this.estButton.TabIndex = 26;
-            this.estButton.Text = "Estimate";
-            this.estButton.UseVisualStyleBackColor = true;
-            this.estButton.Click += new System.EventHandler(this.estButton_Click);
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.ColumnCount = 2;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 90F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Controls.Add(this.estTimeLabel, 0, 0);
-            this.tableLayoutPanel4.Controls.Add(this.estTime, 1, 0);
-            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(41, 3);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 1;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(244, 26);
-            this.tableLayoutPanel4.TabIndex = 27;
-            // 
-            // estTimeLabel
-            // 
-            this.estTimeLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.estTimeLabel.AutoSize = true;
-            this.estTimeLabel.Location = new System.Drawing.Point(7, 5);
-            this.estTimeLabel.Name = "estTimeLabel";
-            this.estTimeLabel.Size = new System.Drawing.Size(75, 16);
-            this.estTimeLabel.TabIndex = 24;
-            this.estTimeLabel.Text = "Draw Time:";
-            // 
-            // estTime
-            // 
-            this.estTime.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.estTime.AutoSize = true;
-            this.estTime.Location = new System.Drawing.Point(111, 5);
-            this.estTime.Name = "estTime";
-            this.estTime.Size = new System.Drawing.Size(112, 16);
-            this.estTime.TabIndex = 23;
-            this.estTime.Text = "D00:H00:M00:S00";
-            this.estTime.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // vectorBox
-            // 
-            this.vectorBox.AutoSize = true;
-            this.vectorBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.vectorBox.Location = new System.Drawing.Point(203, 159);
-            this.vectorBox.Name = "vectorBox";
-            this.vectorBox.Size = new System.Drawing.Size(182, 32);
-            this.vectorBox.TabIndex = 39;
-            this.vectorBox.Text = "Vector Mode";
-            this.vectorBox.UseVisualStyleBackColor = true;
-            this.vectorBox.CheckedChanged += new System.EventHandler(this.vectorBox_CheckedChanged);
-            // 
-            // directDrawBox
-            // 
-            this.directDrawBox.AutoSize = true;
-            this.directDrawBox.CheckAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.directDrawBox.Location = new System.Drawing.Point(3, 75);
-            this.directDrawBox.Name = "directDrawBox";
-            this.directDrawBox.Size = new System.Drawing.Size(80, 34);
-            this.directDrawBox.TabIndex = 33;
-            this.directDrawBox.Text = "Direct Draw";
-            this.directDrawBox.UseVisualStyleBackColor = true;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -1146,8 +1146,12 @@
             this.Enter += new System.EventHandler(this.MainForm_Enter);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel6.PerformLayout();
@@ -1192,10 +1196,6 @@
             this.tableLayoutPanel28.PerformLayout();
             this.tableLayoutPanel31.ResumeLayout(false);
             this.tableLayoutPanel31.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel4.ResumeLayout(false);
-            this.tableLayoutPanel4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
