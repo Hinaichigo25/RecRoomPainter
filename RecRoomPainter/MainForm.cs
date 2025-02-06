@@ -18,103 +18,55 @@ namespace RecRoomPainter
         public static ScalingMode scaleType = ScalingMode.Box;
         public static ScalingMode processScaleType = ScalingMode.NearestNeighbor;
 
-        const int MOUSEDELAY = 40;
+        const int MOUSEUPDELAY = 40;
+        const int MOUSEDOWNDELAY = 20;
+        const int MOUSETURNDELAY = 20;
         int COLORCHANGEDELAY = 1000;
 
-        public class UserSettingVars
+        public static class UserSettings
         {
-            public int DrawW
+            static UserSettings()
             {
-                get; set;
+                DrawW = 0;
+                DrawH = 0;
+                DrawX = 0;
+                DrawY = 0;
+                CropW = 0;
+                CropH = 0;
+                CropX = 0;
+                CropY = 0;
+                Pixelation = 1;
+                MaxColors = 16;
+                SkipColors = 0;
+                Passes = 1;
+                FillFirstLayer = false;
+                DitherPattern = 0;
+                QuantType = 0;
+                PenSize = 4;
+                VectorMode = false;
+                DirectDraw = false;
             }
-            public int DrawH
-            {
-                get; set;
-            }
-            public int DrawX
-            {
-                get; set;
-            }
-            public int DrawY
-            {
-                get; set;
-            }
-            public int CropW
-            {
-                get; set;
-            }
-            public int CropH
-            {
-                get; set;
-            }
-            public int CropX
-            {
-                get; set;
-            }
-            public int CropY
-            {
-                get; set;
-            }
+            public static int DrawW { get; set; }
+            public static int DrawH { get; set; }
+            public static int DrawX { get; set; }
+            public static int DrawY { get; set; }
+            public static int CropW { get; set; }
+            public static int CropH { get; set; }
+            public static int CropX { get; set; }
+            public static int CropY { get; set; }
+            public static double Pixelation { get; set; }
+            public static int MaxColors { get; set; }
+            public static int SkipColors { get; set; }
 
-            public double Pixelation
-            {
-                get; set;
-            }
-            public int MaxColors
-            {
-                get; set;
-            }
-            public int SkipColors
-            {
-                get; set;
-            }
-            public bool FillFirstLayer
-            {
-                get; set;
-            }
-            public int DitherPattern
-            {
-                get; set;
-            }
-            public int QuantType
-            {
-                get; set;
-            }
+            public static int Passes { get; set; }
+            public static bool FillFirstLayer { get; set; }
+            public static int DitherPattern { get; set; }
+            public static int QuantType { get; set; }
+            public static float PenSize { get; set; }
+            public static bool VectorMode { get; set; }
+            public static bool DirectDraw { get; set;}
 
-            public float PenSize
-            {
-                get; set;
-            }
-            public bool VectorMode
-            {
-                get; set;
-            }
-            public bool DirectDraw
-            {
-                get; set;
-            }
         }
-
-        public static UserSettingVars UserSettings = new UserSettingVars
-        {
-            DrawW = 0,
-            DrawH = 0,
-            DrawX = 0,
-            DrawY = 0,
-            CropW = 0,
-            CropH = 0,
-            CropX = 0,
-            CropY = 0,
-            Pixelation = 1,
-            MaxColors = 16,
-            SkipColors = 0,
-            FillFirstLayer = false,
-            DitherPattern = 0,
-            QuantType = 0,
-            PenSize = 4,
-            VectorMode = false,
-            DirectDraw = false,
-        };
 
         public static class DrawImage
         {
@@ -447,6 +399,7 @@ namespace RecRoomPainter
             {
                 SetCursorPos(x, y);
                 Thread.Sleep(delay);
+                System.Threading.Thread.Sleep(delay);
             }
             estimatedTime += delay;
         }
@@ -492,7 +445,7 @@ namespace RecRoomPainter
             }
 
             DrawSinglePixel(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), est);
-            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), MOUSEDELAY / 2, est);
+            LeftMouseDown(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), MOUSEDOWNDELAY, est);
 
             while (true)
             {
@@ -566,13 +519,8 @@ namespace RecRoomPainter
                 {
                     break;
                 }
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < UserSettings.Passes; i++)
                 {
-                    int speed = 1;
-                    if (i == 4)
-                    {
-                        speed = 20;
-                    }
                     if (i % 2 == 1)
                     {
                         DrawLine(-addXValues[max], -addYValues[max], dirLength[max]);
@@ -581,7 +529,7 @@ namespace RecRoomPainter
                     {
                         DrawLine(addXValues[max], addYValues[max], dirLength[max]);
                     }
-                    MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), speed, est);
+                    MoveMouse(UserSettings.DrawX + (int)Math.Round(x * UserSettings.PenSize), UserSettings.DrawY + (int)Math.Round(y * UserSettings.PenSize), MOUSETURNDELAY, est);
                 }
             }
             if (changes > 0)
@@ -653,9 +601,9 @@ namespace RecRoomPainter
 
         void DrawSinglePixel(int xpos, int ypos, bool est)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < UserSettings.Passes; i++)
             {
-                LeftMouseDown(xpos, ypos, MOUSEDELAY / 2, est);
+                LeftMouseDown(xpos, ypos, MOUSEDOWNDELAY, est);
                 LeftMouseUp(xpos, ypos, 2, est);
             }
         }
@@ -665,14 +613,14 @@ namespace RecRoomPainter
             int xpos = UserSettings.DrawX + (int)Math.Round(px * UserSettings.PenSize);
             int ypos = UserSettings.DrawY + (int)Math.Round(py * UserSettings.PenSize);
 
-            LeftMouseDown(xpos, ypos, MOUSEDELAY, est);
+            LeftMouseDown(xpos, ypos, MOUSEDOWNDELAY, est);
             int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
             if (changes == 0)
             {
                 matrix[px, py] = 0;
                 changes = 1;
             }
-            LeftMouseUp(xpos, ypos, MOUSEDELAY / 2, est);
+            LeftMouseUp(xpos, ypos, MOUSEUPDELAY, est);
             return changes;
         }
 

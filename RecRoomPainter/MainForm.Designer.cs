@@ -838,7 +838,7 @@
             "Wu",
             "MedianCut",
             "Octree"});
-            this.quantBox.Location = new System.Drawing.Point(53, 5);
+            this.quantBox.Location = new System.Drawing.Point(53, 4);
             this.quantBox.Name = "quantBox";
             this.quantBox.Size = new System.Drawing.Size(138, 24);
             this.quantBox.TabIndex = 26;
@@ -922,6 +922,7 @@
             this.directDrawBox.TabIndex = 33;
             this.directDrawBox.Text = "Direct Draw";
             this.directDrawBox.UseVisualStyleBackColor = true;
+            this.directDrawBox.CheckedChanged += new System.EventHandler(this.directDrawBox_CheckedChanged);
             // 
             // tableLayoutPanel20
             // 
@@ -1087,7 +1088,7 @@
             "SierraLite",
             "StevensonArce",
             "Stucki"});
-            this.ditherBox.Location = new System.Drawing.Point(53, 5);
+            this.ditherBox.Location = new System.Drawing.Point(53, 4);
             this.ditherBox.Name = "ditherBox";
             this.ditherBox.Size = new System.Drawing.Size(138, 24);
             this.ditherBox.TabIndex = 26;
