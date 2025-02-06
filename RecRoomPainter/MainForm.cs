@@ -116,10 +116,13 @@ namespace RecRoomPainter
             DirectDraw = false,
         };
 
+        public static class DrawImage
+        {
+            public static Bitmap Original { get; set; }
+            public static Bitmap Modified { get; set; }
+            public static Bitmap Preview { get; set; }
+        }
 
-        public static Bitmap imageFile;
-        public static Bitmap imageModified;
-        public static Bitmap imagePreview;
 
         bool scanDirection = false;
         long estimatedTime = 0;
@@ -217,8 +220,8 @@ namespace RecRoomPainter
             {
                 EnableControls(false);
                 progressBar1.Value = 0;
-                imageModified = (Bitmap)imageFile.Clone();
-                imageModified = BitmapExtensions.Resize(imageFile, new Size((int)Math.Round(UserSettings.DrawW * UserSettings.Pixelation), (int)Math.Round(UserSettings.DrawH * UserSettings.Pixelation)), processScaleType);
+                DrawImage.Modified = (Bitmap)DrawImage.Original.Clone();
+                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Original, new Size((int)Math.Round(UserSettings.DrawW * UserSettings.Pixelation), (int)Math.Round(UserSettings.DrawH * UserSettings.Pixelation)), processScaleType);
 
                 progressBar1.Value = 10;
                 IDitherer dither = OrderedDitherer.Bayer2x2;
@@ -281,16 +284,16 @@ namespace RecRoomPainter
                 }
                 if (UserSettings.DitherPattern > 0)
                 {
-                    BitmapExtensions.Dither(imageModified, quantizer, dither);
+                    BitmapExtensions.Dither(DrawImage.Modified, quantizer, dither);
                 }
                 else
                 {
-                    imageModified = imageModified.ConvertPixelFormat(PixelFormat.Format32bppArgb, quantizer);
+                    DrawImage.Modified = DrawImage.Modified.ConvertPixelFormat(PixelFormat.Format32bppArgb, quantizer);
                 }
                 progressBar1.Value = 50;
-                //imageModified = BitmapExtensions.Resize(imageModified, imageFile.Size, ScalingMode.NearestNeighbor);
-                imageModified = CropImageSet(imageModified);
-                imageModified = BitmapExtensions.Resize(imageModified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSize), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSize)), ScalingMode.NearestNeighbor);
+                //DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, DrawImage.Original.Size, ScalingMode.NearestNeighbor);
+                DrawImage.Modified = CropImageSet(DrawImage.Modified);
+                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, new Size((int)Math.Round(UserSettings.DrawW / UserSettings.PenSize), (int)Math.Round(UserSettings.DrawH / UserSettings.PenSize)), ScalingMode.NearestNeighbor);
                 SetPreview();
 
                 progressBar1.Value = 100;
@@ -683,14 +686,14 @@ namespace RecRoomPainter
             }
             estimatedTime += 1000;
 
-            Color[] pallet = ImageToPallet(imageModified);
+            Color[] pallet = ImageToPallet(DrawImage.Modified);
 
-            int[,] tMatrix = new int[imageModified.Width, imageModified.Height];
+            int[,] tMatrix = new int[DrawImage.Modified.Width, DrawImage.Modified.Height];
 
             // Initialize the 2D array with values filled with 0
-            for (int i = 0; i < imageModified.Width; i++)
+            for (int i = 0; i < DrawImage.Modified.Width; i++)
             {
-                for (int j = 0; j < imageModified.Height; j++)
+                for (int j = 0; j < DrawImage.Modified.Height; j++)
                 {
                     tMatrix[i, j] = 0;
                 }
@@ -704,11 +707,11 @@ namespace RecRoomPainter
 
                 if (c > 0)
                 {
-                    for (int i = 0; i < imageModified.Width; i++)
+                    for (int i = 0; i < DrawImage.Modified.Width; i++)
                     {
-                        for (int j = 0; j < imageModified.Height; j++)
+                        for (int j = 0; j < DrawImage.Modified.Height; j++)
                         {
-                            if (imageModified.GetPixel(i, j) == pallet[c - 1])
+                            if (DrawImage.Modified.GetPixel(i, j) == pallet[c - 1])
                             {
                                 tMatrix[i, j] = 1;
                             }
@@ -723,14 +726,14 @@ namespace RecRoomPainter
 
                 List<int[]> pixelList = new List<int[]>(0);
 
-                int[,] cMatrix = new int[imageModified.Width, imageModified.Height];
+                int[,] cMatrix = new int[DrawImage.Modified.Width, DrawImage.Modified.Height];
 
                 if (UserSettings.FillFirstLayer && c == 0)
                 {
                     // Initialize the 2D array with values filled with 1
-                    for (int i = 0; i < imageModified.Width; i++)
+                    for (int i = 0; i < DrawImage.Modified.Width; i++)
                     {
-                        for (int j = 0; j < imageModified.Height; j++)
+                        for (int j = 0; j < DrawImage.Modified.Height; j++)
                         {
                             cMatrix[i, j] = 1;
                         }
@@ -738,7 +741,7 @@ namespace RecRoomPainter
                 }
                 else
                 {
-                    cMatrix = CoverageMatrix(imageModified, pallet[c]);
+                    cMatrix = CoverageMatrix(DrawImage.Modified, pallet[c]);
                 }
 
                 if (!est)
@@ -806,22 +809,22 @@ namespace RecRoomPainter
             // picture that the user chose.
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                imageFile = new Bitmap(openFileDialog1.FileName);
-                imageFile = imageFile.ConvertPixelFormat(PixelFormat.Format32bppArgb);
-                UserSettings.DrawW = imageFile.Width;
-                UserSettings.DrawH = imageFile.Height;
+                DrawImage.Original = new Bitmap(openFileDialog1.FileName);
+                DrawImage.Original = DrawImage.Original.ConvertPixelFormat(PixelFormat.Format32bppArgb);
+                UserSettings.DrawW = DrawImage.Original.Width;
+                UserSettings.DrawH = DrawImage.Original.Height;
                 UserSettings.DrawX = 0;
                 UserSettings.DrawY = 0;
-                UserSettings.CropW = imageFile.Width;
-                UserSettings.CropH = imageFile.Height;
+                UserSettings.CropW = DrawImage.Original.Width;
+                UserSettings.CropH = DrawImage.Original.Height;
                 UserSettings.CropX = 0;
                 UserSettings.CropY = 0;
                 UserSettings.DirectDraw = false;
                 UpdateUITextValues();
-                imageModified = imageFile;
+                DrawImage.Modified = DrawImage.Original;
                 ProcessImage();
-                pictureBox1.Image = BitmapExtensions.Resize(imageModified, new Size(1920, 1080), scaleType, true);
-                imagePreview = imageModified;
+                pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Modified, new Size(1920, 1080), scaleType, true);
+                DrawImage.Preview = DrawImage.Modified;
                 EnableControls(true);
             }
         }
@@ -829,10 +832,10 @@ namespace RecRoomPainter
         private void ClearButton_Click(object sender, EventArgs e)
         {
             pictureBox1.Image = null;
-            imageFile = null;
-            imageModified = null;
-            imageModified = null;
-            imagePreview = null;
+            DrawImage.Original = null;
+            DrawImage.Modified = null;
+            DrawImage.Modified = null;
+            DrawImage.Preview = null;
             EnableControls(false);
         }
 
@@ -912,8 +915,8 @@ namespace RecRoomPainter
         }
         public void SetPreview()
         {
-            imagePreview = (Bitmap)imageModified.Clone();
-            pictureBox1.Image = BitmapExtensions.Resize(imagePreview, new Size((int)Math.Round(imagePreview.Width * UserSettings.PenSize), (int)Math.Round(imagePreview.Height * UserSettings.PenSize)), scaleType, true);
+            DrawImage.Preview = (Bitmap)DrawImage.Modified.Clone();
+            pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Preview, new Size((int)Math.Round(DrawImage.Preview.Width * UserSettings.PenSize), (int)Math.Round(DrawImage.Preview.Height * UserSettings.PenSize)), scaleType, true);
         }
 
         private void estButton_Click(object sender, EventArgs e)
@@ -947,7 +950,7 @@ namespace RecRoomPainter
             }
             catch (Exception)
             {
-                UserSettings.DrawW = imageModified.Width;
+                UserSettings.DrawW = DrawImage.Modified.Width;
             }
             ProcessImage();
 
@@ -963,7 +966,7 @@ namespace RecRoomPainter
             }
             catch (Exception)
             {
-                UserSettings.DrawH = imageModified.Height;
+                UserSettings.DrawH = DrawImage.Modified.Height;
             }
             ProcessImage();
         }
@@ -1066,7 +1069,7 @@ namespace RecRoomPainter
                         UserSettings.CropH = newy;
                         UpdateUITextValues();
                         ProcessImage();
-                        m.UpdateImage(imagePreview);
+                        m.UpdateImage(DrawImage.Preview);
                     }
                     lastSize = m.Size;
                     m.TopMost = true;
@@ -1084,8 +1087,8 @@ namespace RecRoomPainter
             CropWindow m = new CropWindow(mouse);
             m.Show();
             WindowState = FormWindowState.Minimized;
-            m.pictureBox1.Image = imagePreview;
-            m.Size = new Size(m.pictureBox1.Location.X + imageModified.Width, m.pictureBox1.Location.Y + imageModified.Height);
+            m.pictureBox1.Image = DrawImage.Preview;
+            m.Size = new Size(m.pictureBox1.Location.X + DrawImage.Modified.Width, m.pictureBox1.Location.Y + DrawImage.Modified.Height);
             m.StartPosition = FormStartPosition.CenterScreen;
 
         }
@@ -1191,7 +1194,7 @@ namespace RecRoomPainter
         private void MainForm_Activated(object sender, EventArgs e)
         {
             UpdateUITextValues();
-            if (imageModified != null)
+            if (DrawImage.Modified != null)
                 ProcessImage();
         }
 

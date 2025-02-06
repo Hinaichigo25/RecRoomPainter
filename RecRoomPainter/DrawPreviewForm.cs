@@ -6,7 +6,7 @@ namespace RecRoomPainter
 {
     public partial class DrawPreviewForm : Form
     {
-        Bitmap imagePreview = MainForm.imagePreview;
+        Bitmap imagePreview = MainForm.DrawImage.Preview;
         Point startWindowLocation = new Point(0, 0);
         Point startMouseLocation = new Point(0, 0);
         private Point initialMousePosition;

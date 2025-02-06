@@ -22,8 +22,8 @@ namespace RecRoomPainter
             this.instruct.Text = "Set First Point!";
             oldCropXY.X = 0;
             oldCropXY.Y = 0;
-            oldCropWH.Width = MainForm.imageFile.Width;
-            oldCropWH.Height = MainForm.imageFile.Height;
+            oldCropWH.Width = MainForm.DrawImage.Original.Width;
+            oldCropWH.Height = MainForm.DrawImage.Original.Height;
 
         }
 
@@ -46,7 +46,7 @@ namespace RecRoomPainter
                     MainForm.UserSettings.CropY = newCropXY.Y;
                     MainForm.UserSettings.CropH = newCropWH.Height;
                     MainForm.UserSettings.CropW = newCropWH.Width;
-                    pictureBox1.Image = MainForm.CropImageSet(MainForm.imageFile);
+                    pictureBox1.Image = MainForm.CropImageSet(MainForm.DrawImage.Original);
                     break;
             }
 
@@ -122,7 +122,7 @@ namespace RecRoomPainter
             MainForm.UserSettings.CropY = oldCropXY.Y;
             MainForm.UserSettings.CropH = oldCropWH.Height;
             MainForm.UserSettings.CropW = oldCropWH.Width;
-            pictureBox1.Image = MainForm.imageFile;
+            pictureBox1.Image = MainForm.DrawImage.Original;
         }
     }
 }
