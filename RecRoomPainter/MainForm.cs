@@ -43,6 +43,7 @@ namespace RecRoomPainter
                 DitherPattern = 0;
                 QuantType = 0;
                 PenSize = 4;
+                RandomOrder = false;
                 VectorMode = false;
                 DirectDraw = false;
             }
@@ -65,6 +66,7 @@ namespace RecRoomPainter
             public static float PenSize { get; set; }
             public static bool VectorMode { get; set; }
             public static bool DirectDraw { get; set;}
+            public static bool RandomOrder { get; set;}
 
         }
 
@@ -144,10 +146,10 @@ namespace RecRoomPainter
             YBox.Enabled = enable;
             GapXBox.Enabled = enable;
             CropButton.Enabled = enable;
-            CropHBox.Enabled = enable;
-            CropWBox.Enabled = enable;
-            CropXBox.Enabled = enable;
-            CropYBox.Enabled = enable;
+            cropXnum.Enabled = enable;
+            cropYnum.Enabled = enable;
+            cropWnum.Enabled = enable;
+            cropHnum.Enabled = enable;
         }
 
         public void UpdateUITextValues()
@@ -159,10 +161,10 @@ namespace RecRoomPainter
             XBox.Text = UserSettings.DrawX.ToString();
             YBox.Text = UserSettings.DrawY.ToString();
             GapXBox.Text = (UserSettings.PenSize - 1).ToString();
-            CropHBox.Text = UserSettings.CropH.ToString();
-            CropWBox.Text = UserSettings.CropW.ToString();
-            CropXBox.Text = UserSettings.CropX.ToString();
-            CropYBox.Text = UserSettings.CropY.ToString();
+            cropXnum.Value = UserSettings.CropX;
+            cropYnum.Value = UserSettings.CropY;
+            cropWnum.Value = UserSettings.CropW;
+            cropHnum.Value = UserSettings.CropH;
         }
 
 
@@ -649,6 +651,7 @@ namespace RecRoomPainter
 
             for (int c = 0; c < pallet.Length; c++)
             {
+
                 float progress = (float)(c / (float)pallet.Length) * 100;
                 progressBar1.Value = (int)progress;
 
@@ -699,26 +702,35 @@ namespace RecRoomPainter
                 estimatedTime += COLORCHANGEDELAY * 6;
 
 
+                Random rng = new Random();
 
-                for (int i2 = 0; i2 < cMatrix.GetLength(0); i2++)
+                var coords = Enumerable.Range(0, cMatrix.GetLength(0))
+                    .SelectMany(i2 => Enumerable.Range(0, cMatrix.GetLength(1)),
+                                (i2, j2) => new { i2, j2 });
+
+                if (UserSettings.RandomOrder)
                 {
-                    for (int j2 = 0; j2 < cMatrix.GetLength(1); j2++)
-                    {
-                        Application.DoEvents();
-                        if (ModifierKeys == Keys.Alt)
-                        {
-                            goto stopdrawing;
-                        }
-                        if (cMatrix[i2, j2] >= 1)
-                        {
-                            int[] row = { i2, j2 };
-                            pixelList.Add(row);
-                        }
-                        if (cMatrix[i2, j2] >= 1)
-                        {
-                            DrawPixel(tMatrix, cMatrix, i2, j2, est);
-                        }
+                    coords = coords.OrderBy(x => rng.Next()).ToList();
+                }
+                else
+                {
+                    coords = coords.ToList();
+                }
 
+                    foreach (var coord in coords)
+                {
+                    Application.DoEvents();
+
+                    if (ModifierKeys == Keys.Alt)
+                    {
+                        goto stopdrawing;
+                    }
+
+                    if (cMatrix[coord.i2, coord.j2] >= 1)
+                    {
+                        int[] row = { coord.i2, coord.j2 };
+                        pixelList.Add(row);
+                        DrawPixel(tMatrix, cMatrix, coord.i2, coord.j2, est);
                     }
                 }
 
@@ -1041,58 +1053,6 @@ namespace RecRoomPainter
 
         }
 
-        private void CropYBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                UserSettings.CropY = Convert.ToInt32(CropYBox.Text);
-                UserSettings.CropY = int.Parse(CropYBox.Text);
-            }
-            catch (Exception)
-            {
-                UserSettings.CropY = 0;
-            }
-        }
-
-        private void CropXBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                UserSettings.CropX = Convert.ToInt32(CropXBox.Text);
-                UserSettings.CropX = int.Parse(CropXBox.Text);
-            }
-            catch (Exception)
-            {
-                UserSettings.CropX = 0;
-            }
-        }
-
-        private void CropHBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                UserSettings.CropH = Convert.ToInt32(CropHBox.Text);
-                UserSettings.CropH = int.Parse(CropHBox.Text);
-            }
-            catch (Exception)
-            {
-                UserSettings.CropH = 0;
-            }
-        }
-
-        private void CropWBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                UserSettings.CropW = Convert.ToInt32(CropWBox.Text);
-                UserSettings.CropW = int.Parse(CropWBox.Text);
-            }
-            catch (Exception)
-            {
-                UserSettings.CropW = 0;
-            }
-        }
-
         private void YBox_Leave(object sender, EventArgs e)
         {
             // Delay interval between the drawing of each pixel
@@ -1210,6 +1170,70 @@ namespace RecRoomPainter
             {
                 UserSettings.QuantType = 0;
             }
+        }
+
+        private void randomBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.RandomOrder = randomBox.Checked;
+            }
+            catch (Exception)
+            {
+                UserSettings.RandomOrder = false;
+            }
+        }
+
+        private void cropHnum_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.CropH = (int)cropHnum.Value;
+            }
+            catch (Exception)
+            {
+                UserSettings.CropH = 0;
+            }
+            ProcessImage();
+        }
+
+        private void cropYnum_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.CropY = (int)cropYnum.Value;
+            }
+            catch (Exception)
+            {
+                UserSettings.CropY = 0;
+            }
+            ProcessImage();
+        }
+
+        private void cropWnum_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.CropW = (int)cropWnum.Value;
+            }
+            catch (Exception)
+            {
+                UserSettings.CropW = 0;
+            }
+            ProcessImage();
+        }
+
+        private void cropXnum_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UserSettings.CropX = (int)cropXnum.Value;
+            }
+            catch (Exception)
+            {
+                UserSettings.CropX = 0;
+            }
+            ProcessImage();
         }
     }
 }
