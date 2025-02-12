@@ -340,12 +340,15 @@ namespace RecRoomPainter
 
             Clipboard.SetText(hex);
 
-            const int CCLocationX = 1334;
-            const int CCLocationY = 836;
-            const int HexCLocationX = 1366;
-            const int HexCLocationY = 652;
-            const int DoneCLocationX = 1320;
-            const int DoneCLocationY = 756;
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+            int CCLocationX = (int)(screenWidth * 0.7);
+            int CCLocationY = (int)(screenHeight * 0.75);
+            int HexCLocationX = (int)(screenWidth * 0.7);
+            int HexCLocationY = (int)(screenHeight * 0.6);
+            int DoneCLocationX = (int)(screenWidth * 0.7);
+            int DoneCLocationY = (int)(screenHeight * 0.7);
 
             void FullLeftClick(int x, int y)
             {
@@ -418,7 +421,6 @@ namespace RecRoomPainter
         {
             int[,] matrix = new int[img.Width, img.Height];
 
-            // Initialize the 2D array with values filled based on color match
             for (int i = 0; i < img.Width; i++)
             {
                 for (int j = 0; j < img.Height; j++)
