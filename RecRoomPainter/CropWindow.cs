@@ -42,10 +42,10 @@ namespace RecRoomPainter
                     newCropWH = new Size(mouse.Location.X + 10, mouse.Location.Y + 20);
                     this.instruct.Text = "Finished!";
                     state = 2;
-                    MainForm.UserSettings.CropX = newCropXY.X;
-                    MainForm.UserSettings.CropY = newCropXY.Y;
-                    MainForm.UserSettings.CropH = newCropWH.Height;
-                    MainForm.UserSettings.CropW = newCropWH.Width;
+                    MainForm.Settings.CropX = newCropXY.X;
+                    MainForm.Settings.CropY = newCropXY.Y;
+                    MainForm.Settings.CropH = newCropWH.Height;
+                    MainForm.Settings.CropW = newCropWH.Width;
                     pictureBox1.Image = MainForm.CropImageSet(MainForm.DrawImage.Original);
                     break;
             }
@@ -60,10 +60,10 @@ namespace RecRoomPainter
         private void AcceptButton_Click(object sender, EventArgs e)
         {
 
-            MainForm.UserSettings.CropX = newCropXY.X;
-            MainForm.UserSettings.CropY = newCropXY.Y;
-            MainForm.UserSettings.CropH = newCropWH.Height;
-            MainForm.UserSettings.CropW = newCropWH.Width;
+            MainForm.Settings.CropX = newCropXY.X;
+            MainForm.Settings.CropY = newCropXY.Y;
+            MainForm.Settings.CropH = newCropWH.Height;
+            MainForm.Settings.CropW = newCropWH.Width;
 
 
             Form mainForm = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
@@ -83,10 +83,10 @@ namespace RecRoomPainter
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            MainForm.UserSettings.CropX = oldCropXY.X;
-            MainForm.UserSettings.CropY = oldCropXY.Y;
-            MainForm.UserSettings.CropH = oldCropWH.Height;
-            MainForm.UserSettings.CropW = oldCropWH.Width;
+            MainForm.Settings.CropX = oldCropXY.X;
+            MainForm.Settings.CropY = oldCropXY.Y;
+            MainForm.Settings.CropH = oldCropWH.Height;
+            MainForm.Settings.CropW = oldCropWH.Width;
 
             Form mainForm = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
             if (mainForm != null)
@@ -118,10 +118,10 @@ namespace RecRoomPainter
         {
             state = 0;
             this.instruct.Text = "Set First Point!";
-            MainForm.UserSettings.CropX = oldCropXY.X;
-            MainForm.UserSettings.CropY = oldCropXY.Y;
-            MainForm.UserSettings.CropH = oldCropWH.Height;
-            MainForm.UserSettings.CropW = oldCropWH.Width;
+            MainForm.Settings.CropX = oldCropXY.X;
+            MainForm.Settings.CropY = oldCropXY.Y;
+            MainForm.Settings.CropH = oldCropWH.Height;
+            MainForm.Settings.CropW = oldCropWH.Width;
             pictureBox1.Image = MainForm.DrawImage.Original;
         }
     }
