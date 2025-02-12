@@ -24,8 +24,8 @@ namespace RecRoomPainter
             static Time()
             {
                 MouseUpDelay = 40;
-                MouseDownDelay = 20;
-                MouseTurnDelay = 20;
+                MouseDownDelay = 40;
+                MouseTurnDelay = 45;
                 ColorChangeDelay = 1000;
                 EstimatedTime = 0;
             }
@@ -34,6 +34,19 @@ namespace RecRoomPainter
             public static int MouseTurnDelay { get; }
             public static int ColorChangeDelay { get; set; }
             public static long EstimatedTime { get; set; }
+
+            public static void ColorChangeDefault()
+            {
+                ColorChangeDelay = 1000;
+            }
+
+            public static void Sleep(int miliseconds, bool est)
+            {
+                if (!est) {
+                    Thread.Sleep(miliseconds);
+                }
+                EstimatedTime += miliseconds;
+            }
         }
 
 
@@ -121,10 +134,8 @@ namespace RecRoomPainter
                 if (!estMode)
                 {
                     SetCursorPos(x, y);
-                    Thread.Sleep(delay);
-                    System.Threading.Thread.Sleep(delay);
                 }
-                Time.EstimatedTime += delay;
+                Time.Sleep(delay, estMode);
             }
 
             private static void DrawClick(int id, int x, int y, int delay, bool estMode)
@@ -133,9 +144,8 @@ namespace RecRoomPainter
                 {
                     SetCursorPos(x, y);
                     mouse_event(id, x, y, 0, 0);
-                    System.Threading.Thread.Sleep(delay);
                 }
-                Time.EstimatedTime += delay;
+                Time.Sleep(delay, estMode);
             }
 
             public static void LeftDown(int x, int y, int delay, bool estMode)
@@ -357,9 +367,9 @@ namespace RecRoomPainter
             int DoneCLocationX = (int)(screenWidth * 0.7);
             int DoneCLocationY = (int)(screenHeight * 0.7);
 
-            void FullLeftClick(int x, int y)
+            void FullLeftClick(int x, int y, bool estMode)
             {
-                Thread.Sleep(Time.ColorChangeDelay);
+                Time.Sleep(Time.ColorChangeDelay, estMode);
                 Mouse.Move(x, y, 0, est);
                 Mouse.LeftDown(x, y, 0, est);
                 Mouse.LeftUp(x, y, 0, est);
@@ -371,34 +381,34 @@ namespace RecRoomPainter
             {
                 return;
             }
-            FullLeftClick(CCLocationX, CCLocationY);
+            FullLeftClick(CCLocationX, CCLocationY, est);
             if (UserForceQuit())
             {
                 return;
             }
-            FullLeftClick(HexCLocationX, HexCLocationY);
+            FullLeftClick(HexCLocationX, HexCLocationY, est);
             if (UserForceQuit())
             {
                 return;
             }
-            Thread.Sleep(Time.ColorChangeDelay);
+            Time.Sleep(Time.ColorChangeDelay, est);
             SendKeys.Send("^(a)");
             if (UserForceQuit())
             {
                 return;
             }
-            Thread.Sleep(Time.ColorChangeDelay);
+            Time.Sleep(Time.ColorChangeDelay, est);
             SendKeys.Send("^(v)");
             if (UserForceQuit())
             {
                 return;
             }
-            FullLeftClick(DoneCLocationX, DoneCLocationY);
+            FullLeftClick(DoneCLocationX, DoneCLocationY, est);
             if (UserForceQuit())
             {
                 return;
             }
-            Thread.Sleep(Time.ColorChangeDelay);
+            Time.Sleep(Time.ColorChangeDelay, est);
         }
 
         public static int GetMaxDirIndex(int[] arr)
@@ -563,7 +573,7 @@ namespace RecRoomPainter
             return changes;
         }
 
-        Color[] ImageToPallet(Bitmap img)
+        static Color[] ImageToPallet(Bitmap img)
         {
             // Create a HashSet to store unique numbers
             HashSet<Color> uniqueColorSet = new HashSet<Color>();
@@ -599,9 +609,7 @@ namespace RecRoomPainter
             return pallet;
         }
 
-
-
-        void DrawSinglePixel(int xpos, int ypos, bool est)
+        static void DrawSinglePixel(int xpos, int ypos, bool est)
         {
             for (int i = 0; i < Settings.Passes; i++)
             {
@@ -628,13 +636,13 @@ namespace RecRoomPainter
 
         private bool Draw(bool est)
         {
-            Time.ColorChangeDelay = 1000;
+            Time.ColorChangeDefault();
             if (!est)
             {
                 ActivateWindow("Rec Room");
                 Thread.Sleep(1000);
             }
-            Time.EstimatedTime += 1000;
+            Time.Sleep(1000, est);
 
             Color[] pallet = ImageToPallet(DrawImage.Modified);
 
