@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
 using KGySoft.CoreLibraries;
@@ -79,8 +80,8 @@ namespace RecRoomPainter
             public static int QuantType { get; set; }
             public static float PenSize { get; set; }
             public static bool VectorMode { get; set; }
-            public static bool DirectDraw { get; set;}
-            public static bool RandomOrder { get; set;}
+            public static bool DirectDraw { get; set; }
+            public static bool RandomOrder { get; set; }
 
         }
 
@@ -115,9 +116,15 @@ namespace RecRoomPainter
             // This is a replacement for Cursor.Position in WinForms
             [DllImport("user32.dll")]
             private static extern bool SetCursorPos(int x, int y);
-            public static void Move(int x, int y)
+            public static void Move(int x, int y, int delay, bool estMode)
             {
-                SetCursorPos(x, y);
+                if (!estMode)
+                {
+                    SetCursorPos(x, y);
+                    Thread.Sleep(delay);
+                    System.Threading.Thread.Sleep(delay);
+                }
+                Time.EstimatedTime += delay;
             }
 
             private static void DrawClick(int id, int x, int y, int delay, bool estMode)
@@ -353,7 +360,7 @@ namespace RecRoomPainter
             void FullLeftClick(int x, int y)
             {
                 Thread.Sleep(Time.ColorChangeDelay);
-                Mouse.Move(x, y);
+                Mouse.Move(x, y, 0, est);
                 Mouse.LeftDown(x, y, 0, est);
                 Mouse.LeftUp(x, y, 0, est);
             }
@@ -438,17 +445,7 @@ namespace RecRoomPainter
             return matrix;
         }
 
-
-        void MoveMouse(int x, int y, int delay, bool estMode)
-        {
-            if (!estMode)
-            {
-                Mouse.Move(x, y);
-                Thread.Sleep(delay);
-                System.Threading.Thread.Sleep(delay);
-            }
-            Time.EstimatedTime += delay;
-        }
+        private record Direction(int X, int Y);
 
         int NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, int changes, bool est)
         {
@@ -475,6 +472,7 @@ namespace RecRoomPainter
                 int[] pack = { count, end, total };
                 return pack;
             }
+
             void DrawLine(int dirX, int dirY, int steps)
             {
                 changes += steps;
@@ -495,6 +493,7 @@ namespace RecRoomPainter
 
             while (true)
             {
+
                 if (!est)
                 {
                     Application.DoEvents();
@@ -504,55 +503,34 @@ namespace RecRoomPainter
                     }
                 }
 
-                List<int> addXValues = new List<int>();
-                List<int> addYValues = new List<int>();
 
-                //Up
-                addXValues.Add(0);
-                addYValues.Add(1);
 
-                //Down
-                addXValues.Add(0);
-                addYValues.Add(-1);
-
-                //Right
-                addXValues.Add(1);
-                addYValues.Add(0);
-
-                //Left
-                addXValues.Add(-1);
-                addYValues.Add(0);
+                List<Direction> directions = new()
+                {
+                    new(0, 1),  // Up
+                    new(0, -1), // Down
+                    new(1, 0),  // Left
+                    new(-1, 0)  // Right
+                };
 
                 if (Settings.VectorMode)
                 {
-                    //TopRight
-                    addXValues.Add(1);
-                    addYValues.Add(1);
-
-                    //BottomRight
-                    addXValues.Add(1);
-                    addYValues.Add(-1);
-
-                    //TopLeft
-                    addXValues.Add(-1);
-                    addYValues.Add(1);
-
-                    //BottomLeft
-                    addXValues.Add(-1);
-                    addYValues.Add(-1);
-
+                    directions.Add(new(1, 1)); //TopRight
+                    directions.Add(new(1, -1)); //BottomRight
+                    directions.Add(new(-1, 1)); //TopLeft
+                    directions.Add(new(-1, -1)); //BottomLeft
                 }
 
-                int[] dirLength = Enumerable.Repeat(0, addXValues.Capacity).ToArray();
-                int[] pixCount = Enumerable.Repeat(0, addXValues.Capacity).ToArray();
+                int[] dirLength = Enumerable.Repeat(0, directions.Capacity).ToArray();
+                int[] pixCount = Enumerable.Repeat(0, directions.Capacity).ToArray();
 
 
-                for (int i = 0; i < addXValues.Capacity; i++)
+                for (int i = 0; i < directions.Capacity; i++)
                 {
 
                     int xSave = x;
                     int ySave = y;
-                    int[] pack = CheckNeighbor(addXValues[i], addYValues[i], 0, 0, 0);
+                    int[] pack = CheckNeighbor(directions[i].X, directions[i].Y, 0, 0, 0);
                     dirLength[i] = pack[1];
                     pixCount[i] = pack[0];
                     x = xSave;
@@ -569,13 +547,13 @@ namespace RecRoomPainter
                 {
                     if (i % 2 == 1)
                     {
-                        DrawLine(-addXValues[max], -addYValues[max], dirLength[max]);
+                        DrawLine(-directions[max].X, -directions[max].Y, dirLength[max]);
                     }
                     else
                     {
-                        DrawLine(addXValues[max], addYValues[max], dirLength[max]);
+                        DrawLine(directions[max].X, directions[max].Y, dirLength[max]);
                     }
-                    MoveMouse(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseTurnDelay, est);
+                    Mouse.Move(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseTurnDelay, est);
                 }
             }
             if (changes > 0)
@@ -739,7 +717,7 @@ namespace RecRoomPainter
                     coords = coords.ToList();
                 }
 
-                    foreach (var coord in coords)
+                foreach (var coord in coords)
                 {
                     Application.DoEvents();
 
