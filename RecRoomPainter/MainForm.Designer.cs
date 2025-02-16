@@ -62,7 +62,6 @@
             GapXBox = new System.Windows.Forms.TextBox();
             label9 = new System.Windows.Forms.Label();
             tableLayoutPanel22 = new System.Windows.Forms.TableLayoutPanel();
-            CropButton = new System.Windows.Forms.Button();
             tableLayoutPanel23 = new System.Windows.Forms.TableLayoutPanel();
             tableLayoutPanel24 = new System.Windows.Forms.TableLayoutPanel();
             cropYnum = new System.Windows.Forms.NumericUpDown();
@@ -594,7 +593,6 @@
             // 
             tableLayoutPanel22.ColumnCount = 1;
             tableLayoutPanel22.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            tableLayoutPanel22.Controls.Add(CropButton, 0, 0);
             tableLayoutPanel22.Controls.Add(tableLayoutPanel23, 0, 1);
             tableLayoutPanel22.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutPanel22.Location = new System.Drawing.Point(228, 3);
@@ -604,18 +602,6 @@
             tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 65.93407F));
             tableLayoutPanel22.Size = new System.Drawing.Size(157, 88);
             tableLayoutPanel22.TabIndex = 32;
-            // 
-            // CropButton
-            // 
-            CropButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            CropButton.Enabled = false;
-            CropButton.Location = new System.Drawing.Point(3, 3);
-            CropButton.Name = "CropButton";
-            CropButton.Size = new System.Drawing.Size(151, 23);
-            CropButton.TabIndex = 0;
-            CropButton.Text = "Crop Image";
-            CropButton.UseVisualStyleBackColor = true;
-            CropButton.Click += CropButton_Click;
             // 
             // tableLayoutPanel23
             // 
@@ -1084,7 +1070,7 @@
             quantBox.Enabled = false;
             quantBox.FormattingEnabled = true;
             quantBox.Items.AddRange(new object[] { "Wu", "MedianCut", "Octree" });
-            quantBox.Location = new System.Drawing.Point(53, 3);
+            quantBox.Location = new System.Drawing.Point(53, 4);
             quantBox.Name = "quantBox";
             quantBox.Size = new System.Drawing.Size(132, 24);
             quantBox.TabIndex = 26;
@@ -1122,7 +1108,7 @@
             ditherBox.Enabled = false;
             ditherBox.FormattingEnabled = true;
             ditherBox.Items.AddRange(new object[] { "None", "Bayer2x2", "Bayer3x3", "Bayer4x4", "Bayer8x8", "BlueNoise", "DottedHalftone", "Atkinson", "Burkes", "FloydSteinberg", "JarvisJudiceNinke", "Sierra2", "Sierra3", "SierraLite", "StevensonArce", "Stucki" });
-            ditherBox.Location = new System.Drawing.Point(53, 3);
+            ditherBox.Location = new System.Drawing.Point(53, 4);
             ditherBox.Name = "ditherBox";
             ditherBox.Size = new System.Drawing.Size(132, 24);
             ditherBox.TabIndex = 26;
@@ -1240,7 +1226,6 @@
         public System.Windows.Forms.TextBox GapXBox;
         public System.Windows.Forms.Label label9;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel22;
-        public System.Windows.Forms.Button CropButton;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel23;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel24;
         public System.Windows.Forms.Label CropYlabel;
