@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
 using KGySoft.CoreLibraries;
 using KGySoft.Drawing;
 using KGySoft.Drawing.Imaging;
+using Microsoft.VisualBasic.Logging;
+using static RecRoomPainter.MainForm;
 
 namespace RecRoomPainter
 {
@@ -42,7 +45,8 @@ namespace RecRoomPainter
 
             public static void Sleep(int miliseconds, bool est)
             {
-                if (!est) {
+                if (!est)
+                {
                     Thread.Sleep(miliseconds);
                 }
                 EstimatedTime += miliseconds;
@@ -207,7 +211,6 @@ namespace RecRoomPainter
             XBox.Enabled = enable;
             YBox.Enabled = enable;
             GapXBox.Enabled = enable;
-            CropButton.Enabled = enable;
             cropXnum.Enabled = enable;
             cropYnum.Enabled = enable;
             cropWnum.Enabled = enable;
@@ -338,7 +341,7 @@ namespace RecRoomPainter
             }
         }
 
-        public void SetPenColor(string hex, bool est)
+        public static void SetPenColor(string hex, bool est)
         {
             Time.ColorChangeDelay += 80;
 
@@ -434,7 +437,7 @@ namespace RecRoomPainter
             return maxIndex;
         }
 
-        int[,] CoverageMatrix(Bitmap img, Color color)
+        private static int[,] CoverageMatrix(Bitmap img, Color color)
         {
             int[,] matrix = new int[img.Width, img.Height];
 
@@ -455,122 +458,104 @@ namespace RecRoomPainter
             return matrix;
         }
 
-        private record Direction(int X, int Y);
-
-        int NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, int changes, bool est)
+        public class PathStep
         {
+            public Point Location { get; set; } = new Point(0, 0);
+            public long Score { get; set; } = 0;
 
-            int[] CheckNeighbor(int cx, int cy, int count, int end, int total)
+            public PathStep() { }
+
+            public PathStep(Point location, long score)
             {
-                int relx = x + cx;
-                int rely = y + cy;
-                if (relx >= 0 && rely >= 0 && relx < matrix.GetLength(0) && rely < matrix.GetLength(1))
-                {
-                    if (matrix[relx, rely] > 0)
-                    {
-                        x = relx;
-                        y = rely;
-                        return CheckNeighbor(cx, cy, count + 1, total + 1, total + 1);
-                    }
-                    else if (tMatrix[relx, rely] == 0 && !Settings.DirectDraw)
-                    {
-                        x = relx;
-                        y = rely;
-                        return CheckNeighbor(cx, cy, count, end, total + 1);
-                    }
-                }
-                int[] pack = { count, end, total };
-                return pack;
+                Location = location;
+                Score = score;
             }
+        }
 
-            void DrawLine(int dirX, int dirY, int steps)
+        public static bool IsWithinBounds(int[,] matrix, int x, int y)
+        {
+            return x >= 0 && x < matrix.GetLength(0) &&
+                   y >= 0 && y < matrix.GetLength(1);
+        }
+
+        static PathStep GetPathScore(int[,] tMatrix, int[,] matrix, int x, int y, Point direction, PathStep step)
+        {
+            var newX = direction.X + x;
+            var newY = direction.Y + y;
+            if (IsWithinBounds(matrix, newX, newY))
             {
-                changes += steps;
-                matrix[x, y] = 0;
-                for (int i = 0; i < steps; i++)
+                if (tMatrix[newX, newY] < 1)
                 {
-                    if (x + dirX >= 0 && y + dirY >= 0 && x + dirX < matrix.GetLength(0) && y + dirY < matrix.GetLength(1))
+                    if (matrix[newX, newY] > 0)
                     {
-                        x += dirX;
-                        y += dirY;
-                        matrix[x, y] = 0;
-                    }
-                }
-            }
-
-            DrawSinglePixel(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), est);
-            Mouse.LeftDown(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseDownDelay, est);
-
-            while (true)
-            {
-
-                if (!est)
-                {
-                    Application.DoEvents();
-                    if (ModifierKeys == Keys.Alt)
-                    {
-                        break;
-                    }
-                }
-
-
-
-                List<Direction> directions = new()
-                {
-                    new(0, 1),  // Up
-                    new(0, -1), // Down
-                    new(1, 0),  // Left
-                    new(-1, 0)  // Right
-                };
-
-                if (Settings.VectorMode)
-                {
-                    directions.Add(new(1, 1)); //TopRight
-                    directions.Add(new(1, -1)); //BottomRight
-                    directions.Add(new(-1, 1)); //TopLeft
-                    directions.Add(new(-1, -1)); //BottomLeft
-                }
-
-                int[] dirLength = Enumerable.Repeat(0, directions.Capacity).ToArray();
-                int[] pixCount = Enumerable.Repeat(0, directions.Capacity).ToArray();
-
-
-                for (int i = 0; i < directions.Capacity; i++)
-                {
-
-                    int xSave = x;
-                    int ySave = y;
-                    int[] pack = CheckNeighbor(directions[i].X, directions[i].Y, 0, 0, 0);
-                    dirLength[i] = pack[1];
-                    pixCount[i] = pack[0];
-                    x = xSave;
-                    y = ySave;
-                }
-
-                int max = GetMaxDirIndex(pixCount);
-
-                if (pixCount[max] == 0)
-                {
-                    break;
-                }
-                for (int i = 0; i < Settings.Passes; i++)
-                {
-                    if (i % 2 == 1)
-                    {
-                        DrawLine(-directions[max].X, -directions[max].Y, dirLength[max]);
+                        step.Location = new Point(newX, newY);
+                        step.Score++;
+                        GetPathScore(tMatrix, matrix, newX, newY, direction, step);
                     }
                     else
                     {
-                        DrawLine(directions[max].X, directions[max].Y, dirLength[max]);
+                        GetPathScore(tMatrix, matrix, newX, newY, direction, step);
                     }
-                    Mouse.Move(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseTurnDelay, est);
                 }
             }
-            if (changes > 0)
+            return step;
+        }
+        List<Point> FindBestPath(int[,] tMatrix, int[,] matrix, int x, int y, List<Point> directions, List<Point> path)
+        {
+            List<PathStep> paths = new List<PathStep>();
+            foreach (var dir in directions)
             {
-                DrawSinglePixel(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), est);
+                paths.Add(GetPathScore(tMatrix, matrix, x, y, dir, new PathStep(new Point(x, y), 0)));
             }
-            return changes;
+            paths.Sort((a, b) => b.Score.CompareTo(a.Score));
+            path.Add(paths[0].Location);
+            return path;
+        }
+
+        static void ClearPath(int[,] matrix, Point start, Point end)
+        {
+            Point dir = new Point(Math.Sign(end.X - start.X), Math.Sign(end.Y - start.Y));
+            for (int i = start.X, j = start.Y; i <= end.X && j <= end.Y; i += dir.X, j += dir.Y)
+            {
+                matrix[i, j] = 0;
+            }
+        }
+
+        int NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, List<Point> directions, bool est)
+        {
+
+            List<Point> path = FindBestPath(tMatrix, matrix, x, y, directions, new List<Point>());
+
+            if (path.Count > 0)
+            {
+                ClearPath(matrix, new Point(x, y), path[0]);
+                x = path[0].X;
+                y = path[0].Y;
+                Mouse.LeftDown(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseDownDelay, est);
+                foreach (Point loc in path)
+                {
+
+                    if (!est)
+                    {
+                        Application.DoEvents();
+                        if (ModifierKeys == Keys.Alt)
+                        {
+                            break;
+                        }
+                    }
+                    x = loc.X;
+                    y = loc.Y;
+                    Mouse.Move(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseTurnDelay, est);
+
+                }
+
+                Mouse.LeftUp(Settings.DrawX + (int)Math.Round(x * Settings.PenSize), Settings.DrawY + (int)Math.Round(y * Settings.PenSize), Time.MouseDownDelay, est);
+            }
+            else
+            {
+                DrawSinglePixel(x, y, est);
+            }
+            return path.Count;
         }
 
         static Color[] ImageToPallet(Bitmap img)
@@ -618,13 +603,13 @@ namespace RecRoomPainter
             }
         }
 
-        int DrawPixel(int[,] tMatrix, int[,] matrix, int px, int py, bool est)
+        int DrawPixel(int[,] tMatrix, int[,] matrix, int px, int py, List<Point> directions, bool est)
         {
             int xpos = Settings.DrawX + (int)Math.Round(px * Settings.PenSize);
             int ypos = Settings.DrawY + (int)Math.Round(py * Settings.PenSize);
 
             Mouse.LeftDown(xpos, ypos, Time.MouseDownDelay, est);
-            int changes = NeighborLineDraw(tMatrix, matrix, px, py, 0, est);
+            int changes = NeighborLineDraw(tMatrix, matrix, px, py, directions, est);
             if (changes == 0)
             {
                 matrix[px, py] = 0;
@@ -636,6 +621,22 @@ namespace RecRoomPainter
 
         private bool Draw(bool est)
         {
+            List<Point> directions = new()
+                {
+                    new(0, 1),  // Up
+                    new(0, -1), // Down
+                    new(1, 0),  // Left
+                    new(-1, 0)  // Right
+                };
+
+            if (Settings.VectorMode)
+            {
+                directions.Add(new(1, 1)); //TopRight
+                directions.Add(new(1, -1)); //BottomRight
+                directions.Add(new(-1, 1)); //TopLeft
+                directions.Add(new(-1, -1)); //BottomLeft
+            }
+
             Time.ColorChangeDefault();
             if (!est)
             {
@@ -707,7 +708,6 @@ namespace RecRoomPainter
                 {
                     SetPenColor($"{pallet[c].R:X2}{pallet[c].G:X2}{pallet[c].B:X2}", est);
                 }
-                Time.EstimatedTime += Time.ColorChangeDelay * 6;
 
 
                 Random rng = new Random();
@@ -738,7 +738,7 @@ namespace RecRoomPainter
                     {
                         int[] row = { coord.i2, coord.j2 };
                         pixelList.Add(row);
-                        DrawPixel(tMatrix, cMatrix, coord.i2, coord.j2, est);
+                        DrawPixel(tMatrix, cMatrix, coord.i2, coord.j2, directions, est);
                     }
                 }
 
@@ -752,7 +752,7 @@ namespace RecRoomPainter
                     }
                     if (cMatrix[p[0], p[1]] >= 1)
                     {
-                        DrawPixel(tMatrix, cMatrix, p[0], p[1], est);
+                        DrawPixel(tMatrix, cMatrix, p[0], p[1], directions, est);
                     }
                 }
 
@@ -1047,18 +1047,6 @@ namespace RecRoomPainter
             {
                 MessageBox.Show(new Form() { TopMost = true }, "No image was found", "Image Error", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
-        }
-
-        private void CropButton_Click(object sender, EventArgs e)
-        {
-            MouseEventArgs mouse = e as MouseEventArgs;
-            CropWindow m = new CropWindow(mouse);
-            m.Show();
-            WindowState = FormWindowState.Minimized;
-            m.pictureBox1.Image = DrawImage.Preview;
-            m.Size = new Size(m.pictureBox1.Location.X + DrawImage.Modified.Width, m.pictureBox1.Location.Y + DrawImage.Modified.Height);
-            m.StartPosition = FormStartPosition.CenterScreen;
-
         }
 
         private void YBox_Leave(object sender, EventArgs e)
