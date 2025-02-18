@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -415,29 +416,6 @@ namespace RecRoomPainter
             Time.Sleep(Time.ColorChangeDelay, est);
         }
 
-        public static int GetMaxDirIndex(int[] arr)
-        {
-            if (arr == null || arr.Length == 0)
-                throw new ArgumentException("Array is null or empty");
-
-            int maxIndex = 0;
-            for (int i = 1; i < arr.Length; i++)
-            {
-                if (i > 3)
-                {
-                    if (arr[i] > arr[maxIndex] * 2)
-                        maxIndex = i;
-                }
-                else
-                {
-                    if (arr[i] > arr[maxIndex])
-                        maxIndex = i;
-                }
-            }
-
-            return maxIndex;
-        }
-
         private static int[,] CoverageMatrix(Bitmap img, Color color)
         {
             int[,] matrix = new int[img.Width, img.Height];
@@ -463,7 +441,10 @@ namespace RecRoomPainter
             public Point Location { get; set; }
             public long Score { get; set; }
 
-            public PathStep() { }
+            public PathStep() {
+                Location = new Point(0,0);
+                Score = 0;
+            }
 
             public PathStep(Point location, long score)
             {
@@ -474,37 +455,35 @@ namespace RecRoomPainter
 
         public class Path
         {
-            private static bool IsWithinBounds(int[,] matrix, int x, int y)
+            private static bool IsWithinBounds(int[,] matrix, Point loc)
             {
-                return x >= 0 && x < matrix.GetLength(0) &&
-                       y >= 0 && y < matrix.GetLength(1);
+                return loc.X >= 0 && loc.X < matrix.GetLength(0) &&
+                       loc.Y >= 0 && loc.Y < matrix.GetLength(1);
             }
 
-            // Now iterative – no more recursive rabbit holes!
-            private static PathStep GetPathScore(int[,] tMatrix, int[,] matrix, int startX, int startY, Point direction)
+            private static PathStep GetPathScore(int[,] tMatrix, int[,] matrix, Point startLocation, Point direction)
             {
-                var step = new PathStep(new Point(startX, startY), 0);
-                int x = startX, y = startY;
+                var step = new PathStep(startLocation, 0);
 
                 while (true)
                 {
-                    int newX = x + direction.X;
-                    int newY = y + direction.Y;
-                    if (!IsWithinBounds(matrix, newX, newY) || tMatrix[newX, newY] >= 1)
+                    Point newLoc = new Point(startLocation.X + direction.X, startLocation.Y + direction.Y);
+
+                    if (!IsWithinBounds(matrix, newLoc) || tMatrix[newLoc.X, newLoc.Y] >= 1)
                         break;
 
-                    x = newX;
-                    y = newY;
-                    if (matrix[x, y] > 0)
+                    startLocation = newLoc;
+                    if (matrix[startLocation.X, startLocation.Y] > 0)
                     {
                         step.Score++;
+                        step.Location = startLocation;
                     }
-                    step.Location = new Point(x, y);
+                    
                 }
                 return step;
             }
 
-            private static List<PathStep> GetAllPathValues(int[,] tMatrix, int[,] matrix, int x, int y, List<Point> directions)
+            private static List<PathStep> GetAllPathValues(int[,] tMatrix, int[,] matrix, Point startLocation, List<Point> directions)
             {
                 var paths = new List<PathStep>();
                 if (directions == null || directions.Count == 0)
@@ -512,113 +491,81 @@ namespace RecRoomPainter
 
                 foreach (var dir in directions)
                 {
-                    paths.Add(GetPathScore(tMatrix, matrix, x, y, dir));
+                    paths.Add(GetPathScore(tMatrix, matrix, startLocation, dir));
                 }
                 // Best score first
                 paths.Sort((a, b) => b.Score.CompareTo(a.Score));
                 return paths;
             }
 
-            public static PathStep PathSearch(int[,] tMatrix, int[,] matrix, int x, int y, List<Point> directions)
+            public static PathStep PathSearch(int[,] tMatrix, int[,] matrix, Point startLocation, List<Point> directions)
             {
-                return PathSearchHelper(tMatrix, matrix, x, y, x, y, directions, 0);
+                return PathSearchHelper(tMatrix, (int[,])matrix.Clone(), startLocation, startLocation, directions, 0);
             }
 
-            private static PathStep PathSearchHelper(int[,] tMatrix, int[,] matrix, int startX, int startY, int endX, int endY, List<Point> directions, int currentDepth)
+            private static PathStep PathSearchHelper(int[,] tMatrix, int[,] matrix, Point start, Point end, List<Point> directions, int currentDepth)
             {
-                var paths = GetAllPathValues(tMatrix, matrix, startX, startY, directions);
-                var modifiedLocations = ClearPath(matrix, new Point(startX, startY), new Point(endX, endY));
-                if (paths.Count == 0)
-                    return new PathStep(new Point(endX, endY), 0);
+                ClearPath(matrix, start, end); //marks a line start to end in the matrix with 0 instead of 1.
+                var paths = GetAllPathValues(tMatrix, matrix, end, directions); //traces down each direction, records the end point and value of each direction.
+                paths.Sort((a, b) => b.Score.CompareTo(a.Score)); //Sets the highest value path to the front of the list.
+
+                if (paths[0].Score == 0)
+                    return paths[0]; //If best path's score is 0, return.
 
                 if (currentDepth < Settings.Depth)
                 {
-                    for (int i = 0; i < paths.Count; i++)
+                    for (int i = 0; i < paths.Count; i++) //Iterate over each of the paths, exploring them deeper.
                     {
-                        var recursiveResult = PathSearchHelper(tMatrix, matrix, endX, endY, paths[i].Location.X, paths[i].Location.Y, directions, currentDepth + 1);
-                        paths[i].Score += recursiveResult.Score;
+
+                        paths[i].Score += PathSearchHelper(tMatrix, (int[,])matrix.Clone(), end, paths[i].Location, directions, currentDepth + 1).Score;
+                        //add the total score after searching down the paths to choose the best path to take in the end.
                     }
-                    // Re-sort after accumulating recursive scores
-                    paths.Sort((a, b) => b.Score.CompareTo(a.Score));
                 }
-                RestorePath(matrix, modifiedLocations);
+                paths.Sort((a, b) => b.Score.CompareTo(a.Score));
                 return paths[0];
             }
 
-            // Fixed ClearPath: now it clears from start to end inclusive without stepping out-of-bounds.
-            public static List<Point> ClearPath(int[,] matrix, Point start, Point end)
+            public static void ClearPath(int[,] matrix, Point start, Point end)
             {
-                List<Point> modifiedLocations = new List<Point>();
-
                 int dx = Math.Sign(end.X - start.X);
                 int dy = Math.Sign(end.Y - start.Y);
-                int x = start.X, y = start.Y;
 
-                if (IsWithinBounds(matrix, x, y))
+                while (IsWithinBounds(matrix, start))
                 {
-                    if (matrix[x, y] > 0)
-                    {
-                        modifiedLocations.Add(new Point(x, y));
-                        matrix[x, y] = 0;
-                    }
-                }
+                    matrix[start.X, start.Y] = 0;
 
-                while (x != end.X || y != end.Y)
-                {
-                    x += dx;
-                    y += dy;
-                    if (IsWithinBounds(matrix, x, y))
-                    {
-                        if (matrix[x, y] > 0)
-                        {
-                            modifiedLocations.Add(new Point(x, y));
-                            matrix[x, y] = 0;
-                        }
-                    }
-                    else
-                    {
+                    // Break after processing the endpoint
+                    if (start.X == end.X && start.Y == end.Y)
                         break;
-                    }
-                }
 
-                return modifiedLocations;
-            }
+                    start.X += dx;
+                    start.Y += dy;
 
-            public static void RestorePath(int[,] matrix, List<Point> modifiedLocations)
-            {
-                foreach (var point in modifiedLocations)
-                {
-                    if (IsWithinBounds(matrix, point.X, point.Y))
-                    {
-                        matrix[point.X, point.Y] = 1;
-                    }
                 }
             }
         }
 
 
 
-        public static bool NeighborLineDraw(int[,] tMatrix, int[,] matrix, int x, int y, List<Point> directions, bool est)
+        public static void NeighborLineDraw(int[,] tMatrix, int[,] matrix, Point loc, List<Point> directions, bool est)
         {
-            bool didDraw = false;
             while (true)
             {
-                PathStep path = Path.PathSearch(tMatrix, matrix, x, y, directions);
+                if (!est)
+                {
+                    Application.DoEvents();
+                    if (ModifierKeys == Keys.Alt)
+                        break;
+                }
+                PathStep path = Path.PathSearch(tMatrix, matrix, loc, directions);
+
                 if (path.Score > 0)
                 {
-                    didDraw = true;
-                    Path.ClearPath(matrix, new Point(x, y), path.Location);
+                    Path.ClearPath(matrix, loc, path.Location);
 
-                    if (!est)
-                    {
-                        Application.DoEvents();
-                        if (ModifierKeys == Keys.Alt)
-                            break;
-                    }
-                    x = path.Location.X;
-                    y = path.Location.Y;
-                    Mouse.Move(Settings.DrawX + (int)Math.Round(x * Settings.PenSize),
-                               Settings.DrawY + (int)Math.Round(y * Settings.PenSize),
+                    loc = path.Location;
+                    Mouse.Move(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
+                               Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
                                Time.MouseTurnDelay, est);
                 }
                 else
@@ -626,10 +573,9 @@ namespace RecRoomPainter
                     break;
                 }
             }
-            Mouse.LeftUp(Settings.DrawX + (int)Math.Round(x * Settings.PenSize),
-                         Settings.DrawY + (int)Math.Round(y * Settings.PenSize),
+            Mouse.LeftUp(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
+                         Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
                          Time.MouseDownDelay, est);
-            return didDraw;
         }
 
         static Color[] ImageToPallet(Bitmap img)
@@ -668,16 +614,14 @@ namespace RecRoomPainter
             return pallet;
         }
 
-        void DrawPixel(int[,] tMatrix, int[,] matrix, int px, int py, List<Point> directions, bool est)
+        static void DrawPixel(int[,] tMatrix, int[,] matrix, Point loc, List<Point> directions, bool est)
         {
-            int xpos = Settings.DrawX + (int)Math.Round(px * Settings.PenSize);
-            int ypos = Settings.DrawY + (int)Math.Round(py * Settings.PenSize);
+            int xpos = Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize);
+            int ypos = Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize);
 
             Mouse.LeftDown(xpos, ypos, Time.MouseDownDelay, est);
-            if (!NeighborLineDraw(tMatrix, matrix, px, py, directions, est))
-            {
-                matrix[px, py] = 0;
-            }
+            NeighborLineDraw(tMatrix, matrix, loc, directions, est);
+            matrix[loc.X, loc.Y] = 0;
             Mouse.LeftUp(xpos, ypos, Time.MouseUpDelay, est);
         }
 
@@ -800,7 +744,7 @@ namespace RecRoomPainter
                     {
                         int[] row = { coord.i2, coord.j2 };
                         pixelList.Add(row);
-                        DrawPixel(tMatrix, cMatrix, coord.i2, coord.j2, directions, est);
+                        DrawPixel(tMatrix, cMatrix, new Point(coord.i2, coord.j2), directions, est);
                     }
                 }
 
@@ -814,7 +758,7 @@ namespace RecRoomPainter
                     }
                     if (cMatrix[p[0], p[1]] >= 1)
                     {
-                        DrawPixel(tMatrix, cMatrix, p[0], p[1], directions, est);
+                        DrawPixel(tMatrix, cMatrix, new Point(p[0], p[1]), directions, est);
                     }
                 }
 

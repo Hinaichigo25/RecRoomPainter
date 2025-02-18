@@ -1070,7 +1070,7 @@
             quantBox.Enabled = false;
             quantBox.FormattingEnabled = true;
             quantBox.Items.AddRange(new object[] { "Wu", "MedianCut", "Octree" });
-            quantBox.Location = new System.Drawing.Point(53, 3);
+            quantBox.Location = new System.Drawing.Point(53, 4);
             quantBox.Name = "quantBox";
             quantBox.Size = new System.Drawing.Size(132, 24);
             quantBox.TabIndex = 26;
@@ -1108,7 +1108,7 @@
             ditherBox.Enabled = false;
             ditherBox.FormattingEnabled = true;
             ditherBox.Items.AddRange(new object[] { "None", "Bayer2x2", "Bayer3x3", "Bayer4x4", "Bayer8x8", "BlueNoise", "DottedHalftone", "Atkinson", "Burkes", "FloydSteinberg", "JarvisJudiceNinke", "Sierra2", "Sierra3", "SierraLite", "StevensonArce", "Stucki" });
-            ditherBox.Location = new System.Drawing.Point(53, 3);
+            ditherBox.Location = new System.Drawing.Point(53, 4);
             ditherBox.Name = "ditherBox";
             ditherBox.Size = new System.Drawing.Size(132, 24);
             ditherBox.TabIndex = 26;
