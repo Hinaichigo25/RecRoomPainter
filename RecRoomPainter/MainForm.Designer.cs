@@ -59,8 +59,8 @@
             label7 = new System.Windows.Forms.Label();
             heightInput = new System.Windows.Forms.TextBox();
             tableLayoutPanel12 = new System.Windows.Forms.TableLayoutPanel();
-            GapXBox = new System.Windows.Forms.TextBox();
             label9 = new System.Windows.Forms.Label();
+            depthNumBox = new System.Windows.Forms.NumericUpDown();
             tableLayoutPanel22 = new System.Windows.Forms.TableLayoutPanel();
             tableLayoutPanel23 = new System.Windows.Forms.TableLayoutPanel();
             tableLayoutPanel24 = new System.Windows.Forms.TableLayoutPanel();
@@ -114,6 +114,7 @@
             tableLayoutPanel10.SuspendLayout();
             tableLayoutPanel11.SuspendLayout();
             tableLayoutPanel12.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)depthNumBox).BeginInit();
             tableLayoutPanel22.SuspendLayout();
             tableLayoutPanel23.SuspendLayout();
             tableLayoutPanel24.SuspendLayout();
@@ -551,43 +552,39 @@
             // 
             tableLayoutPanel12.ColumnCount = 1;
             tableLayoutPanel12.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            tableLayoutPanel12.Controls.Add(GapXBox, 0, 1);
             tableLayoutPanel12.Controls.Add(label9, 0, 0);
+            tableLayoutPanel12.Controls.Add(depthNumBox, 0, 1);
             tableLayoutPanel12.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutPanel12.Location = new System.Drawing.Point(3, 3);
             tableLayoutPanel12.Name = "tableLayoutPanel12";
             tableLayoutPanel12.RowCount = 2;
             tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 66F));
+            tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 68F));
             tableLayoutPanel12.Size = new System.Drawing.Size(57, 88);
             tableLayoutPanel12.TabIndex = 31;
-            // 
-            // GapXBox
-            // 
-            GapXBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            GapXBox.Enabled = false;
-            GapXBox.Location = new System.Drawing.Point(2, 24);
-            GapXBox.Margin = new System.Windows.Forms.Padding(2);
-            GapXBox.MaxLength = 10;
-            GapXBox.Name = "GapXBox";
-            GapXBox.Size = new System.Drawing.Size(53, 22);
-            GapXBox.TabIndex = 18;
-            GapXBox.Text = "3.0";
-            GapXBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            GapXBox.Leave += GapXBox_Leave;
             // 
             // label9
             // 
             label9.Anchor = System.Windows.Forms.AnchorStyles.None;
             label9.AutoSize = true;
             label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            label9.Location = new System.Drawing.Point(10, 0);
+            label9.Location = new System.Drawing.Point(4, 2);
             label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(37, 22);
+            label9.Size = new System.Drawing.Size(48, 16);
             label9.TabIndex = 17;
-            label9.Text = "Pen Size";
+            label9.Text = "Depth";
             label9.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // depthNumBox
+            // 
+            depthNumBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            depthNumBox.Location = new System.Drawing.Point(3, 23);
+            depthNumBox.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
+            depthNumBox.Name = "depthNumBox";
+            depthNumBox.Size = new System.Drawing.Size(51, 22);
+            depthNumBox.TabIndex = 18;
+            depthNumBox.ValueChanged += depthNumBox_ValueChanged;
             // 
             // tableLayoutPanel22
             // 
@@ -598,8 +595,8 @@
             tableLayoutPanel22.Location = new System.Drawing.Point(228, 3);
             tableLayoutPanel22.Name = "tableLayoutPanel22";
             tableLayoutPanel22.RowCount = 2;
-            tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.06593F));
-            tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 65.93407F));
+            tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 29.545454F));
+            tableLayoutPanel22.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 70.4545441F));
             tableLayoutPanel22.Size = new System.Drawing.Size(157, 88);
             tableLayoutPanel22.TabIndex = 32;
             // 
@@ -613,27 +610,27 @@
             tableLayoutPanel23.Controls.Add(tableLayoutPanel26, 1, 0);
             tableLayoutPanel23.Controls.Add(tableLayoutPanel27, 1, 1);
             tableLayoutPanel23.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel23.Location = new System.Drawing.Point(3, 32);
+            tableLayoutPanel23.Location = new System.Drawing.Point(3, 29);
             tableLayoutPanel23.Name = "tableLayoutPanel23";
             tableLayoutPanel23.RowCount = 2;
             tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             tableLayoutPanel23.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            tableLayoutPanel23.Size = new System.Drawing.Size(151, 53);
+            tableLayoutPanel23.Size = new System.Drawing.Size(151, 56);
             tableLayoutPanel23.TabIndex = 1;
             // 
             // tableLayoutPanel24
             // 
             tableLayoutPanel24.ColumnCount = 2;
             tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            tableLayoutPanel24.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 17F));
             tableLayoutPanel24.Controls.Add(cropYnum, 0, 0);
             tableLayoutPanel24.Controls.Add(CropYlabel, 1, 0);
             tableLayoutPanel24.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel24.Location = new System.Drawing.Point(3, 29);
+            tableLayoutPanel24.Location = new System.Drawing.Point(3, 31);
             tableLayoutPanel24.Name = "tableLayoutPanel24";
             tableLayoutPanel24.RowCount = 1;
             tableLayoutPanel24.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel24.Size = new System.Drawing.Size(69, 21);
+            tableLayoutPanel24.Size = new System.Drawing.Size(69, 22);
             tableLayoutPanel24.TabIndex = 1;
             // 
             // cropYnum
@@ -643,7 +640,7 @@
             cropYnum.Location = new System.Drawing.Point(3, 3);
             cropYnum.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             cropYnum.Name = "cropYnum";
-            cropYnum.Size = new System.Drawing.Size(38, 22);
+            cropYnum.Size = new System.Drawing.Size(46, 22);
             cropYnum.TabIndex = 3;
             cropYnum.ValueChanged += cropYnum_ValueChanged;
             // 
@@ -651,9 +648,9 @@
             // 
             CropYlabel.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             CropYlabel.AutoSize = true;
-            CropYlabel.Location = new System.Drawing.Point(47, 2);
+            CropYlabel.Location = new System.Drawing.Point(55, 3);
             CropYlabel.Name = "CropYlabel";
-            CropYlabel.Size = new System.Drawing.Size(19, 16);
+            CropYlabel.Size = new System.Drawing.Size(11, 16);
             CropYlabel.TabIndex = 1;
             CropYlabel.Text = "Y";
             CropYlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -662,7 +659,7 @@
             // 
             tableLayoutPanel25.ColumnCount = 2;
             tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            tableLayoutPanel25.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
             tableLayoutPanel25.Controls.Add(CropXlabel, 1, 0);
             tableLayoutPanel25.Controls.Add(cropXnum, 0, 0);
             tableLayoutPanel25.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -670,16 +667,16 @@
             tableLayoutPanel25.Name = "tableLayoutPanel25";
             tableLayoutPanel25.RowCount = 1;
             tableLayoutPanel25.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel25.Size = new System.Drawing.Size(69, 20);
+            tableLayoutPanel25.Size = new System.Drawing.Size(69, 22);
             tableLayoutPanel25.TabIndex = 2;
             // 
             // CropXlabel
             // 
             CropXlabel.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             CropXlabel.AutoSize = true;
-            CropXlabel.Location = new System.Drawing.Point(47, 2);
+            CropXlabel.Location = new System.Drawing.Point(56, 3);
             CropXlabel.Name = "CropXlabel";
-            CropXlabel.Size = new System.Drawing.Size(19, 16);
+            CropXlabel.Size = new System.Drawing.Size(10, 16);
             CropXlabel.TabIndex = 1;
             CropXlabel.Text = "X";
             CropXlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -691,7 +688,7 @@
             cropXnum.Location = new System.Drawing.Point(3, 3);
             cropXnum.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             cropXnum.Name = "cropXnum";
-            cropXnum.Size = new System.Drawing.Size(38, 22);
+            cropXnum.Size = new System.Drawing.Size(47, 22);
             cropXnum.TabIndex = 2;
             cropXnum.ValueChanged += cropXnum_ValueChanged;
             // 
@@ -699,7 +696,7 @@
             // 
             tableLayoutPanel26.ColumnCount = 2;
             tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            tableLayoutPanel26.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             tableLayoutPanel26.Controls.Add(cropWnum, 0, 0);
             tableLayoutPanel26.Controls.Add(CropWlabel, 1, 0);
             tableLayoutPanel26.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -707,7 +704,7 @@
             tableLayoutPanel26.Name = "tableLayoutPanel26";
             tableLayoutPanel26.RowCount = 1;
             tableLayoutPanel26.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel26.Size = new System.Drawing.Size(70, 20);
+            tableLayoutPanel26.Size = new System.Drawing.Size(70, 22);
             tableLayoutPanel26.TabIndex = 3;
             // 
             // cropWnum
@@ -717,7 +714,7 @@
             cropWnum.Location = new System.Drawing.Point(3, 3);
             cropWnum.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             cropWnum.Name = "cropWnum";
-            cropWnum.Size = new System.Drawing.Size(39, 22);
+            cropWnum.Size = new System.Drawing.Size(44, 22);
             cropWnum.TabIndex = 3;
             cropWnum.ValueChanged += cropWnum_ValueChanged;
             // 
@@ -725,9 +722,9 @@
             // 
             CropWlabel.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             CropWlabel.AutoSize = true;
-            CropWlabel.Location = new System.Drawing.Point(48, 2);
+            CropWlabel.Location = new System.Drawing.Point(53, 3);
             CropWlabel.Name = "CropWlabel";
-            CropWlabel.Size = new System.Drawing.Size(19, 16);
+            CropWlabel.Size = new System.Drawing.Size(14, 16);
             CropWlabel.TabIndex = 1;
             CropWlabel.Text = "W";
             CropWlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -736,15 +733,15 @@
             // 
             tableLayoutPanel27.ColumnCount = 2;
             tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            tableLayoutPanel27.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             tableLayoutPanel27.Controls.Add(cropHnum, 0, 0);
             tableLayoutPanel27.Controls.Add(CropHlabel, 1, 0);
             tableLayoutPanel27.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel27.Location = new System.Drawing.Point(78, 29);
+            tableLayoutPanel27.Location = new System.Drawing.Point(78, 31);
             tableLayoutPanel27.Name = "tableLayoutPanel27";
             tableLayoutPanel27.RowCount = 1;
             tableLayoutPanel27.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel27.Size = new System.Drawing.Size(70, 21);
+            tableLayoutPanel27.Size = new System.Drawing.Size(70, 22);
             tableLayoutPanel27.TabIndex = 4;
             // 
             // cropHnum
@@ -754,7 +751,7 @@
             cropHnum.Location = new System.Drawing.Point(3, 3);
             cropHnum.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
             cropHnum.Name = "cropHnum";
-            cropHnum.Size = new System.Drawing.Size(39, 22);
+            cropHnum.Size = new System.Drawing.Size(44, 22);
             cropHnum.TabIndex = 3;
             cropHnum.ValueChanged += cropHnum_ValueChanged;
             // 
@@ -762,9 +759,9 @@
             // 
             CropHlabel.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             CropHlabel.AutoSize = true;
-            CropHlabel.Location = new System.Drawing.Point(48, 2);
+            CropHlabel.Location = new System.Drawing.Point(53, 3);
             CropHlabel.Name = "CropHlabel";
-            CropHlabel.Size = new System.Drawing.Size(19, 16);
+            CropHlabel.Size = new System.Drawing.Size(14, 16);
             CropHlabel.TabIndex = 1;
             CropHlabel.Text = "H";
             CropHlabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1070,7 +1067,7 @@
             quantBox.Enabled = false;
             quantBox.FormattingEnabled = true;
             quantBox.Items.AddRange(new object[] { "Wu", "MedianCut", "Octree" });
-            quantBox.Location = new System.Drawing.Point(53, 4);
+            quantBox.Location = new System.Drawing.Point(53, 3);
             quantBox.Name = "quantBox";
             quantBox.Size = new System.Drawing.Size(132, 24);
             quantBox.TabIndex = 26;
@@ -1108,7 +1105,7 @@
             ditherBox.Enabled = false;
             ditherBox.FormattingEnabled = true;
             ditherBox.Items.AddRange(new object[] { "None", "Bayer2x2", "Bayer3x3", "Bayer4x4", "Bayer8x8", "BlueNoise", "DottedHalftone", "Atkinson", "Burkes", "FloydSteinberg", "JarvisJudiceNinke", "Sierra2", "Sierra3", "SierraLite", "StevensonArce", "Stucki" });
-            ditherBox.Location = new System.Drawing.Point(53, 4);
+            ditherBox.Location = new System.Drawing.Point(53, 3);
             ditherBox.Name = "ditherBox";
             ditherBox.Size = new System.Drawing.Size(132, 24);
             ditherBox.TabIndex = 26;
@@ -1161,6 +1158,7 @@
             tableLayoutPanel11.PerformLayout();
             tableLayoutPanel12.ResumeLayout(false);
             tableLayoutPanel12.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)depthNumBox).EndInit();
             tableLayoutPanel22.ResumeLayout(false);
             tableLayoutPanel23.ResumeLayout(false);
             tableLayoutPanel24.ResumeLayout(false);
@@ -1223,7 +1221,6 @@
         public System.Windows.Forms.Label label7;
         public System.Windows.Forms.TextBox heightInput;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel12;
-        public System.Windows.Forms.TextBox GapXBox;
         public System.Windows.Forms.Label label9;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel22;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel23;
@@ -1272,6 +1269,7 @@
         private System.Windows.Forms.NumericUpDown cropXnum;
         private System.Windows.Forms.NumericUpDown cropWnum;
         private System.Windows.Forms.NumericUpDown cropHnum;
+        private System.Windows.Forms.NumericUpDown depthNumBox;
     }
 }
 

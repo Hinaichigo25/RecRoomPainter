@@ -14,6 +14,7 @@ using KGySoft.CoreLibraries;
 using KGySoft.Drawing;
 using KGySoft.Drawing.Imaging;
 using Microsoft.VisualBasic.Logging;
+using Windows.Security.Cryptography.Certificates;
 using static RecRoomPainter.MainForm;
 
 namespace RecRoomPainter
@@ -44,15 +45,6 @@ namespace RecRoomPainter
             {
                 ColorChangeDelay = 1000;
             }
-
-            public static void Sleep(int miliseconds, bool est)
-            {
-                if (!est)
-                {
-                    Thread.Sleep(miliseconds);
-                }
-                EstimatedTime += miliseconds;
-            }
         }
 
 
@@ -72,11 +64,10 @@ namespace RecRoomPainter
                 Pixelation = 1;
                 MaxColors = 16;
                 SkipColors = 0;
-                Depth = 4;
+                Depth = 3;
                 FillFirstLayer = false;
                 DitherPattern = 0;
                 QuantType = 0;
-                PenSize = 4;
                 RandomOrder = false;
                 VectorMode = false;
                 DirectDraw = false;
@@ -97,7 +88,6 @@ namespace RecRoomPainter
             public static bool FillFirstLayer { get; set; }
             public static int DitherPattern { get; set; }
             public static int QuantType { get; set; }
-            public static float PenSize { get; set; }
             public static bool VectorMode { get; set; }
             public static bool DirectDraw { get; set; }
             public static bool RandomOrder { get; set; }
@@ -124,8 +114,59 @@ namespace RecRoomPainter
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
 
+        public static class ActionQueue
+        {
+            static ActionQueue()
+            {
+                AQueue = new Queue<Action>();
+            }
 
+            public static Queue<Action> AQueue { get; set; }
+
+            public static void EmptyQueue()
+            {
+                AQueue.Clear();
+            }
+
+            public static void LeftDown(int x, int y, int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Mouse.DrawClick(0x02, x, y, delay)));
+                Time.EstimatedTime += delay;
+
+            }
+            public static void LeftUp(int x, int y, int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Mouse.DrawClick(0x04, x, y, delay)));
+                Time.EstimatedTime += delay;
+            }
+            public static void RightDown(int x, int y, int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Mouse.DrawClick(0x08, x, y, delay)));
+                Time.EstimatedTime += delay;
+            }
+            public static void RightUp(int x, int y, int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Mouse.DrawClick(0x10, x, y, delay)));
+                Time.EstimatedTime += delay;
+            }
+            public static void Move(int x, int y, int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Mouse.Move(x, y, delay)));
+                Time.EstimatedTime += delay;
+            }
+            public static void Sleep(int delay)
+            {
+                ActionQueue.AQueue.Enqueue((() => Thread.Sleep(delay)));
+                Time.EstimatedTime += delay;
+            }
+            public static void KeyPress(string key) => ActionQueue.AQueue.Enqueue((() => SendKeys.Send(key)));
+            public static void SetClipboard(string text) => ActionQueue.AQueue.Enqueue((() => Clipboard.SetText(text)));
+            public static void SetColorSkipValue(int value) => ActionQueue.AQueue.Enqueue((() => Settings.SkipColors = value));
+
+        }
         public static class Mouse
         {
 
@@ -135,41 +176,21 @@ namespace RecRoomPainter
             // This is a replacement for Cursor.Position in WinForms
             [DllImport("user32.dll")]
             private static extern bool SetCursorPos(int x, int y);
-            public static void Move(int x, int y, int delay, bool estMode)
+            public static void Move(int x, int y, int delay)
             {
-                if (!estMode)
-                {
-                    SetCursorPos(x, y);
-                }
-                Time.Sleep(delay, estMode);
+                SetCursorPos(x, y);
+                Thread.Sleep(delay);
             }
 
-            private static void DrawClick(int id, int x, int y, int delay, bool estMode)
+            public static void DrawClick(int id, int x, int y, int delay)
             {
-                if (!estMode)
-                {
-                    SetCursorPos(x, y);
-                    mouse_event(id, x, y, 0, 0);
-                }
-                Time.Sleep(delay, estMode);
+
+                SetCursorPos(x, y);
+                mouse_event(id, x, y, 0, 0);
+                Thread.Sleep(delay);
             }
 
-            public static void LeftDown(int x, int y, int delay, bool estMode)
-            {
-                DrawClick(0x02, x, y, delay, estMode);
-            }
-            public static void LeftUp(int x, int y, int delay, bool estMode)
-            {
-                DrawClick(0x04, x, y, delay, estMode);
-            }
-            public static void RightDown(int x, int y, int delay, bool estMode)
-            {
-                DrawClick(0x08, x, y, delay, estMode);
-            }
-            public static void RightUp(int x, int y, int delay, bool estMode)
-            {
-                DrawClick(0x10, x, y, delay, estMode);
-            }
+
         }
 
 
@@ -212,7 +233,6 @@ namespace RecRoomPainter
             clearButton.Enabled = enable;
             XBox.Enabled = enable;
             YBox.Enabled = enable;
-            GapXBox.Enabled = enable;
             cropXnum.Enabled = enable;
             cropYnum.Enabled = enable;
             cropWnum.Enabled = enable;
@@ -227,7 +247,6 @@ namespace RecRoomPainter
             maxColorsBox.Text = Settings.MaxColors.ToString();
             XBox.Text = Settings.DrawX.ToString();
             YBox.Text = Settings.DrawY.ToString();
-            GapXBox.Text = (Settings.PenSize - 1).ToString();
             cropXnum.Value = Settings.CropX;
             cropYnum.Value = Settings.CropY;
             cropWnum.Value = Settings.CropW;
@@ -314,7 +333,7 @@ namespace RecRoomPainter
                 progressBar1.Value = 50;
                 //DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, DrawImage.Original.Size, ScalingMode.NearestNeighbor);
                 DrawImage.Modified = CropImageSet(DrawImage.Modified);
-                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, new Size((int)Math.Round(Settings.DrawW / Settings.PenSize), (int)Math.Round(Settings.DrawH / Settings.PenSize)), ScalingMode.NearestNeighbor);
+                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, new Size(Settings.DrawW, Settings.DrawH), ScalingMode.NearestNeighbor);
                 SetPreview();
 
                 progressBar1.Value = 100;
@@ -332,8 +351,8 @@ namespace RecRoomPainter
         {
             try
             {
-                if (Draw(false))
-                    MessageBox.Show(new Form() { TopMost = true }, "Drawing Complete", "Done", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                if (Draw())
+                    RunQueue();
                 else
                     MessageBox.Show(new Form() { TopMost = true }, "Drawing halted", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
@@ -343,24 +362,10 @@ namespace RecRoomPainter
             }
         }
 
-        public static void SetPenColor(string hex, bool est)
+        public static void SetPenColor(string hex)
         {
             Time.ColorChangeDelay += 80;
-
-            bool UserForceQuit()
-            {
-                Application.DoEvents();
-                if (ModifierKeys == Keys.Alt)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            Clipboard.SetText(hex);
+            ActionQueue.SetClipboard(hex);
 
             int screenWidth = Screen.PrimaryScreen.Bounds.Width;
             int screenHeight = Screen.PrimaryScreen.Bounds.Height;
@@ -372,48 +377,24 @@ namespace RecRoomPainter
             int DoneCLocationX = (int)(screenWidth * 0.7);
             int DoneCLocationY = (int)(screenHeight * 0.7);
 
-            void FullLeftClick(int x, int y, bool estMode)
+            void FullLeftClick(int x, int y)
             {
-                Time.Sleep(Time.ColorChangeDelay, estMode);
-                Mouse.Move(x, y, 0, est);
-                Mouse.LeftDown(x, y, 0, est);
-                Mouse.LeftUp(x, y, 0, est);
+                ActionQueue.Sleep(Time.ColorChangeDelay);
+                ActionQueue.Move(x, y, 0);
+                ActionQueue.LeftDown(x, y, 0);
+                ActionQueue.LeftUp(x, y, 0);
             }
 
-            Mouse.RightDown(0, 0, 0, est);
-            Mouse.RightUp(0, 0, 0, est);
-            if (UserForceQuit())
-            {
-                return;
-            }
-            FullLeftClick(CCLocationX, CCLocationY, est);
-            if (UserForceQuit())
-            {
-                return;
-            }
-            FullLeftClick(HexCLocationX, HexCLocationY, est);
-            if (UserForceQuit())
-            {
-                return;
-            }
-            Time.Sleep(Time.ColorChangeDelay, est);
-            SendKeys.Send("^(a)");
-            if (UserForceQuit())
-            {
-                return;
-            }
-            Time.Sleep(Time.ColorChangeDelay, est);
-            SendKeys.Send("^(v)");
-            if (UserForceQuit())
-            {
-                return;
-            }
-            FullLeftClick(DoneCLocationX, DoneCLocationY, est);
-            if (UserForceQuit())
-            {
-                return;
-            }
-            Time.Sleep(Time.ColorChangeDelay, est);
+            ActionQueue.RightDown(0, 0, 0);
+            ActionQueue.RightUp(0, 0, 0);
+            FullLeftClick(CCLocationX, CCLocationY);
+            FullLeftClick(HexCLocationX, HexCLocationY);
+            ActionQueue.Sleep(Time.ColorChangeDelay);
+            ActionQueue.KeyPress("^(a)");
+            ActionQueue.Sleep(Time.ColorChangeDelay);
+            ActionQueue.KeyPress("^(v)");
+            FullLeftClick(DoneCLocationX, DoneCLocationY);
+            ActionQueue.Sleep(Time.ColorChangeDelay);
         }
 
         private static bool[,] CoverageMatrix(Bitmap img, Color color, bool[,] matrix)
@@ -509,7 +490,7 @@ namespace RecRoomPainter
                         step.Score++;
                         step.Location = startLocation;
                     }
-                    
+
                 }
                 return step;
             }
@@ -535,19 +516,19 @@ namespace RecRoomPainter
             }
             private static PathStep PathSearchHelper(bool[,] tMatrix, bool[,] matrix, Point start, Point end, List<Point> directions, int currentDepth)
             {
-                var moves = ClearPath(matrix, start, end); 
-                var paths = GetAllPathValues(tMatrix, matrix, end, directions); 
-                paths.Sort((a, b) => b.Score.CompareTo(a.Score)); 
+                var moves = ClearPath(matrix, start, end);
+                var paths = GetAllPathValues(tMatrix, matrix, end, directions);
+                paths.Sort((a, b) => b.Score.CompareTo(a.Score));
 
                 if (paths[0].Score == 0)
                 {
                     RestoreMoves(matrix, moves);
-                    return paths[0]; 
+                    return paths[0];
                 }
 
                 if (currentDepth < Settings.Depth)
                 {
-                    for (int i = 0; i < paths.Count; i++) 
+                    for (int i = 0; i < paths.Count; i++)
                     {
                         PathStep currentPath = paths[i];
                         currentPath.Score += PathSearchHelper(tMatrix, matrix, end, currentPath.Location, directions, currentDepth + 1).Score;
@@ -564,7 +545,7 @@ namespace RecRoomPainter
                 int dx = Math.Sign(end.X - start.X);
                 int dy = Math.Sign(end.Y - start.Y);
 
-                List <Point> moves = [];
+                List<Point> moves = [];
 
                 while (IsWithinBounds(matrix, start))
                 {
@@ -587,7 +568,7 @@ namespace RecRoomPainter
 
             public static void RestoreMoves(bool[,] matrix, List<Point> moves)
             {
-                foreach(var p in moves)
+                foreach (var p in moves)
                 {
                     matrix[p.X, p.Y] = true;
                 }
@@ -597,16 +578,10 @@ namespace RecRoomPainter
 
 
 
-        public static void NeighborLineDraw(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions, bool est)
+        public static void NeighborLineDraw(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions)
         {
             while (true)
             {
-                if (!est)
-                {
-                    Application.DoEvents();
-                    if (ModifierKeys == Keys.Alt)
-                        break;
-                }
                 PathStep path = Path.PathSearch(tMatrix, matrix, loc, directions);
 
                 if (path.Score > 0)
@@ -614,18 +589,14 @@ namespace RecRoomPainter
                     Path.ClearPath(matrix, loc, path.Location);
 
                     loc = path.Location;
-                    Mouse.Move(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
-                               Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
-                               Time.MouseTurnDelay, est);
+                    ActionQueue.Move(Settings.DrawX + loc.X, Settings.DrawY + loc.Y, Time.MouseTurnDelay);
                 }
                 else
                 {
                     break;
                 }
             }
-            Mouse.LeftUp(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
-                         Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
-                         Time.MouseDownDelay, est);
+            ActionQueue.LeftUp(Settings.DrawX + loc.X, Settings.DrawY + loc.Y, Time.MouseDownDelay);
         }
 
         private static Color[] ImageToPallet(Bitmap img)
@@ -672,19 +643,20 @@ namespace RecRoomPainter
         }
 
 
-        static void DrawPixel(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions, bool est)
+        static void DrawPixel(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions)
         {
-            int xpos = Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize);
-            int ypos = Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize);
+            int xpos = Settings.DrawX + loc.X;
+            int ypos = Settings.DrawY + loc.Y;
 
-            Mouse.LeftDown(xpos, ypos, Time.MouseDownDelay, est);
-            NeighborLineDraw(tMatrix, matrix, loc, directions, est);
+            ActionQueue.LeftDown(xpos, ypos, Time.MouseDownDelay);
+            NeighborLineDraw(tMatrix, matrix, loc, directions);
             matrix[loc.X, loc.Y] = false;
-            Mouse.LeftUp(xpos, ypos, Time.MouseUpDelay, est);
+            ActionQueue.LeftUp(xpos, ypos, Time.MouseUpDelay);
         }
 
-        private bool Draw(bool est)
+        private bool Draw()
         {
+            ActionQueue.EmptyQueue();
             List<Point> directions = new()
                 {
                     new(0, 1),  // Up
@@ -702,25 +674,10 @@ namespace RecRoomPainter
             }
 
             Time.ColorChangeDefault();
-            if (!est)
-            {
-                ActivateWindow("Rec Room");
-                Thread.Sleep(1000);
-            }
-            Time.Sleep(1000, est);
 
             Color[] pallet = ImageToPallet(DrawImage.Modified);
 
             bool[,] tMatrix = new bool[DrawImage.Modified.Width, DrawImage.Modified.Height];
-
-            // Initialize the 2D array with values filled with 0
-            for (int i = 0; i < DrawImage.Modified.Width; i++)
-            {
-                for (int j = 0; j < DrawImage.Modified.Height; j++)
-                {
-                    tMatrix[i, j] = false;
-                }
-            }
 
             for (int c = 0; c < pallet.Length; c++)
             {
@@ -758,10 +715,8 @@ namespace RecRoomPainter
                     cMatrix = CoverageMatrix(DrawImage.Modified, pallet[c], new bool[DrawImage.Modified.Width, DrawImage.Modified.Height]);
                 }
 
-                if (!est)
-                {
-                    SetPenColor($"{pallet[c].R:X2}{pallet[c].G:X2}{pallet[c].B:X2}", est);
-                }
+                SetPenColor($"{pallet[c].R:X2}{pallet[c].G:X2}{pallet[c].B:X2}");
+
 
 
                 Random rng = new Random();
@@ -781,49 +736,54 @@ namespace RecRoomPainter
 
                 foreach (var coord in coords)
                 {
-                    Application.DoEvents();
-
-                    if (ModifierKeys == Keys.Alt)
-                    {
-                        goto stopdrawing;
-                    }
 
                     if (cMatrix[coord.i2, coord.j2])
                     {
                         int[] row = { coord.i2, coord.j2 };
                         pixelList.Add(row);
-                        DrawPixel(tMatrix, cMatrix, new Point(coord.i2, coord.j2), directions, est);
+                        DrawPixel(tMatrix, cMatrix, new Point(coord.i2, coord.j2), directions);
                     }
                 }
 
                 foreach (int[] p in pixelList)
                 {
-                    if (!est)
-                    {
-                        Application.DoEvents();
-                        if (ModifierKeys == Keys.Alt)
-                            return false;
-                    }
                     if (cMatrix[p[0], p[1]])
                     {
-                        DrawPixel(tMatrix, cMatrix, new Point(p[0], p[1]), directions, est);
+                        DrawPixel(tMatrix, cMatrix, new Point(p[0], p[1]), directions);
                     }
                 }
-
-                if (!est)
-                {
-                    Settings.SkipColors = c;
-                    UpdateUITextValues();
-                }
+                ActionQueue.SetColorSkipValue(c);
             }
-            if (!est)
-            {
-                Settings.SkipColors = 0;
-                UpdateUITextValues();
-            }
-        stopdrawing:
+            ActionQueue.SetColorSkipValue(0);
             return true;
         }
+        public void RunQueue()
+        {
+            ActivateWindow("Rec Room");
+            Thread.Sleep(1000);
+
+            bool finished = true;
+            while (ActionQueue.AQueue.Count > 0)
+            {
+                if (GetAsyncKeyState(0x12) < 0) // 0x12 is the virtual key code for Alt
+                {
+                    Mouse.DrawClick(0x04, Cursor.Position.X, Cursor.Position.Y, 0);
+                    MessageBox.Show(new Form() { TopMost = true }, "Drawing stopped by user.\nALT key was pressed.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    finished = false;
+                    break;
+                }
+
+                Action action = ActionQueue.AQueue.Dequeue();
+                action();
+            }
+
+            if (finished)
+            {
+                MessageBox.Show(new Form() { TopMost = true }, "Drawing finished", "Finished", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
+            UpdateUITextValues();
+        }
+
 
         private void UploadButton_Click(object sender, EventArgs e)
         {
@@ -938,7 +898,7 @@ namespace RecRoomPainter
         public void SetPreview()
         {
             DrawImage.Preview = (Bitmap)DrawImage.Modified.Clone();
-            pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Preview, new Size((int)Math.Round(DrawImage.Preview.Width * Settings.PenSize), (int)Math.Round(DrawImage.Preview.Height * Settings.PenSize)), scaleType, true);
+            pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Preview, new Size(DrawImage.Preview.Width, DrawImage.Preview.Height), scaleType, true);
         }
 
         private void estButton_Click(object sender, EventArgs e)
@@ -946,7 +906,7 @@ namespace RecRoomPainter
             Time.EstimatedTime = 0;
             progressBar1.Value = 0;
             ProcessImage();
-            Draw(true);
+            Draw();
             progressBar1.Value = 100;
             estTime.Text = ConvertMillisecondsToTimeFormat(Time.EstimatedTime);
         }
@@ -991,19 +951,6 @@ namespace RecRoomPainter
                 Settings.DrawH = DrawImage.Modified.Height;
             }
             ProcessImage();
-        }
-
-        private void GapXBox_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                Settings.PenSize = (float)Convert.ToDouble(GapXBox.Text) + 1;
-                Settings.PenSize = float.Parse(GapXBox.Text) + 1;
-            }
-            catch (Exception)
-            {
-                Settings.PenSize = 1;
-            }
         }
 
         private void maxColorsBox_Leave(object sender, EventArgs e)
@@ -1284,6 +1231,11 @@ namespace RecRoomPainter
                 Settings.CropX = 0;
             }
             ProcessImage();
+        }
+
+        private void depthNumBox_ValueChanged(object sender, EventArgs e)
+        {
+            Settings.Depth = (int)depthNumBox.Value;
         }
     }
 }
