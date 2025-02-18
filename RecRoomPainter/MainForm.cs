@@ -72,7 +72,7 @@ namespace RecRoomPainter
                 Pixelation = 1;
                 MaxColors = 16;
                 SkipColors = 0;
-                Depth = 2;
+                Depth = 4;
                 FillFirstLayer = false;
                 DitherPattern = 0;
                 QuantType = 0;
@@ -436,13 +436,15 @@ namespace RecRoomPainter
             }
             return matrix;
         }
-        public class PathStep
+
+        public struct PathStep
         {
             public Point Location { get; set; }
             public long Score { get; set; }
 
-            public PathStep() {
-                Location = new Point(0,0);
+            public PathStep()
+            {
+                Location = new Point(0, 0);
                 Score = 0;
             }
 
@@ -452,9 +454,10 @@ namespace RecRoomPainter
                 Score = score;
             }
         }
-
-        public class Path
+        public static class Path
         {
+
+
             private static bool IsWithinBounds(int[,] matrix, Point loc)
             {
                 return loc.X >= 0 && loc.X < matrix.GetLength(0) &&
@@ -500,39 +503,48 @@ namespace RecRoomPainter
 
             public static PathStep PathSearch(int[,] tMatrix, int[,] matrix, Point startLocation, List<Point> directions)
             {
-                return PathSearchHelper(tMatrix, (int[,])matrix.Clone(), startLocation, startLocation, directions, 0);
+                return PathSearchHelper(tMatrix, matrix, startLocation, startLocation, directions, 0);
             }
-
             private static PathStep PathSearchHelper(int[,] tMatrix, int[,] matrix, Point start, Point end, List<Point> directions, int currentDepth)
             {
-                ClearPath(matrix, start, end); //marks a line start to end in the matrix with 0 instead of 1.
-                var paths = GetAllPathValues(tMatrix, matrix, end, directions); //traces down each direction, records the end point and value of each direction.
-                paths.Sort((a, b) => b.Score.CompareTo(a.Score)); //Sets the highest value path to the front of the list.
+                var moves = ClearPath(matrix, start, end); 
+                var paths = GetAllPathValues(tMatrix, matrix, end, directions); 
+                paths.Sort((a, b) => b.Score.CompareTo(a.Score)); 
 
                 if (paths[0].Score == 0)
-                    return paths[0]; //If best path's score is 0, return.
+                {
+                    RestoreMoves(matrix, moves);
+                    return paths[0]; 
+                }
 
                 if (currentDepth < Settings.Depth)
                 {
-                    for (int i = 0; i < paths.Count; i++) //Iterate over each of the paths, exploring them deeper.
+                    for (int i = 0; i < paths.Count; i++) 
                     {
-
-                        paths[i].Score += PathSearchHelper(tMatrix, (int[,])matrix.Clone(), end, paths[i].Location, directions, currentDepth + 1).Score;
-                        //add the total score after searching down the paths to choose the best path to take in the end.
+                        PathStep currentPath = paths[i];
+                        currentPath.Score += PathSearchHelper(tMatrix, matrix, end, currentPath.Location, directions, currentDepth + 1).Score;
+                        paths[i] = currentPath;
                     }
                 }
                 paths.Sort((a, b) => b.Score.CompareTo(a.Score));
+                RestoreMoves(matrix, moves);
                 return paths[0];
             }
 
-            public static void ClearPath(int[,] matrix, Point start, Point end)
+            public static List<Point> ClearPath(int[,] matrix, Point start, Point end)
             {
                 int dx = Math.Sign(end.X - start.X);
                 int dy = Math.Sign(end.Y - start.Y);
 
+                List <Point> moves = [];
+
                 while (IsWithinBounds(matrix, start))
                 {
-                    matrix[start.X, start.Y] = 0;
+                    if (matrix[start.X, start.Y] > 0)
+                    {
+                        moves.Add(start);
+                        matrix[start.X, start.Y] = 0;
+                    }
 
                     // Break after processing the endpoint
                     if (start.X == end.X && start.Y == end.Y)
@@ -542,6 +554,16 @@ namespace RecRoomPainter
                     start.Y += dy;
 
                 }
+                return moves;
+            }
+
+            public static void RestoreMoves(int[,] matrix, List<Point> moves)
+            {
+                foreach(var p in moves)
+                {
+                    matrix[p.X, p.Y] = 1;
+                }
+
             }
         }
 
