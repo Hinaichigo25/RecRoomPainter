@@ -416,24 +416,52 @@ namespace RecRoomPainter
             Time.Sleep(Time.ColorChangeDelay, est);
         }
 
-        private static int[,] CoverageMatrix(Bitmap img, Color color)
+        private static bool[,] CoverageMatrix(Bitmap img, Color color, bool[,] matrix)
         {
-            int[,] matrix = new int[img.Width, img.Height];
+            int width = img.Width;
+            int height = img.Height;
 
-            for (int i = 0; i < img.Width; i++)
+            // Define the rectangle and lock the bitmap's bits.
+            Rectangle rect = new Rectangle(0, 0, width, height);
+            BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            try
             {
-                for (int j = 0; j < img.Height; j++)
+                int stride = bmpData.Stride;
+                int bytes = Math.Abs(stride) * height;
+                byte[] pixelData = new byte[bytes];
+
+                // Copy the pixel data into our array.
+                Marshal.Copy(bmpData.Scan0, pixelData, 0, bytes);
+
+                // The expected color components (32bppArgb stores pixels in BGRA order).
+                byte targetB = color.B;
+                byte targetG = color.G;
+                byte targetR = color.R;
+                byte targetA = color.A;
+
+                // Iterate through each pixel.
+                for (int y = 0; y < height; y++)
                 {
-                    if (img.GetPixel(i, j) == color)
+                    int rowStart = y * stride;
+                    for (int x = 0; x < width; x++)
                     {
-                        matrix[i, j] = 1;
-                    }
-                    else
-                    {
-                        matrix[i, j] = 0;
+                        int index = rowStart + x * 4;
+                        byte b = pixelData[index];
+                        byte g = pixelData[index + 1];
+                        byte r = pixelData[index + 2];
+                        byte a = pixelData[index + 3];
+
+                        matrix[x, y] = (b == targetB && g == targetG && r == targetR && a == targetA) ? true : matrix[x, y];
                     }
                 }
             }
+            finally
+            {
+                // Always unlock the bits when done.
+                img.UnlockBits(bmpData);
+            }
+
             return matrix;
         }
 
@@ -458,13 +486,13 @@ namespace RecRoomPainter
         {
 
 
-            private static bool IsWithinBounds(int[,] matrix, Point loc)
+            private static bool IsWithinBounds(bool[,] matrix, Point loc)
             {
                 return loc.X >= 0 && loc.X < matrix.GetLength(0) &&
                        loc.Y >= 0 && loc.Y < matrix.GetLength(1);
             }
 
-            private static PathStep GetPathScore(int[,] tMatrix, int[,] matrix, Point startLocation, Point direction)
+            private static PathStep GetPathScore(bool[,] tMatrix, bool[,] matrix, Point startLocation, Point direction)
             {
                 var step = new PathStep(startLocation, 0);
 
@@ -472,11 +500,11 @@ namespace RecRoomPainter
                 {
                     Point newLoc = new Point(startLocation.X + direction.X, startLocation.Y + direction.Y);
 
-                    if (!IsWithinBounds(matrix, newLoc) || tMatrix[newLoc.X, newLoc.Y] >= 1)
+                    if (!IsWithinBounds(matrix, newLoc) || tMatrix[newLoc.X, newLoc.Y])
                         break;
 
                     startLocation = newLoc;
-                    if (matrix[startLocation.X, startLocation.Y] > 0)
+                    if (matrix[startLocation.X, startLocation.Y])
                     {
                         step.Score++;
                         step.Location = startLocation;
@@ -486,7 +514,7 @@ namespace RecRoomPainter
                 return step;
             }
 
-            private static List<PathStep> GetAllPathValues(int[,] tMatrix, int[,] matrix, Point startLocation, List<Point> directions)
+            private static List<PathStep> GetAllPathValues(bool[,] tMatrix, bool[,] matrix, Point startLocation, List<Point> directions)
             {
                 var paths = new List<PathStep>();
                 if (directions == null || directions.Count == 0)
@@ -501,11 +529,11 @@ namespace RecRoomPainter
                 return paths;
             }
 
-            public static PathStep PathSearch(int[,] tMatrix, int[,] matrix, Point startLocation, List<Point> directions)
+            public static PathStep PathSearch(bool[,] tMatrix, bool[,] matrix, Point startLocation, List<Point> directions)
             {
                 return PathSearchHelper(tMatrix, matrix, startLocation, startLocation, directions, 0);
             }
-            private static PathStep PathSearchHelper(int[,] tMatrix, int[,] matrix, Point start, Point end, List<Point> directions, int currentDepth)
+            private static PathStep PathSearchHelper(bool[,] tMatrix, bool[,] matrix, Point start, Point end, List<Point> directions, int currentDepth)
             {
                 var moves = ClearPath(matrix, start, end); 
                 var paths = GetAllPathValues(tMatrix, matrix, end, directions); 
@@ -531,7 +559,7 @@ namespace RecRoomPainter
                 return paths[0];
             }
 
-            public static List<Point> ClearPath(int[,] matrix, Point start, Point end)
+            public static List<Point> ClearPath(bool[,] matrix, Point start, Point end)
             {
                 int dx = Math.Sign(end.X - start.X);
                 int dy = Math.Sign(end.Y - start.Y);
@@ -540,10 +568,10 @@ namespace RecRoomPainter
 
                 while (IsWithinBounds(matrix, start))
                 {
-                    if (matrix[start.X, start.Y] > 0)
+                    if (matrix[start.X, start.Y])
                     {
                         moves.Add(start);
-                        matrix[start.X, start.Y] = 0;
+                        matrix[start.X, start.Y] = false;
                     }
 
                     // Break after processing the endpoint
@@ -557,11 +585,11 @@ namespace RecRoomPainter
                 return moves;
             }
 
-            public static void RestoreMoves(int[,] matrix, List<Point> moves)
+            public static void RestoreMoves(bool[,] matrix, List<Point> moves)
             {
                 foreach(var p in moves)
                 {
-                    matrix[p.X, p.Y] = 1;
+                    matrix[p.X, p.Y] = true;
                 }
 
             }
@@ -569,7 +597,7 @@ namespace RecRoomPainter
 
 
 
-        public static void NeighborLineDraw(int[,] tMatrix, int[,] matrix, Point loc, List<Point> directions, bool est)
+        public static void NeighborLineDraw(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions, bool est)
         {
             while (true)
             {
@@ -600,50 +628,58 @@ namespace RecRoomPainter
                          Time.MouseDownDelay, est);
         }
 
-        static Color[] ImageToPallet(Bitmap img)
+        private static Color[] ImageToPallet(Bitmap img)
         {
-            // Create a HashSet to store unique numbers
-            HashSet<Color> uniqueColorSet = new HashSet<Color>();
-            for (int j = 0; j < img.Height; j++)
+            HashSet<Color> uniqueColors = new HashSet<Color>();
+
+            // Lock the bitmap
+            Rectangle rect = new Rectangle(0, 0, img.Width, img.Height);
+            BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            try
             {
-                for (int i = 0; i < img.Width; i++)
+                int stride = bmpData.Stride;
+                byte[] pixelData = new byte[Math.Abs(stride) * img.Height];
+                Marshal.Copy(bmpData.Scan0, pixelData, 0, pixelData.Length);
+
+                for (int y = 0; y < img.Height; y++)
                 {
-                    // Add each unique number to the HashSet
-                    if (!uniqueColorSet.Contains(img.GetPixel(i, j)))
+                    int rowStart = y * stride;
+                    for (int x = 0; x < img.Width; x++)
                     {
-                        uniqueColorSet.Add(img.GetPixel(i, j));
-                    }
+                        int index = rowStart + x * 4;
+                        byte b = pixelData[index];
+                        byte g = pixelData[index + 1];
+                        byte r = pixelData[index + 2];
+                        byte a = pixelData[index + 3];
 
-                }
-            }
-            // Convert the HashSet to an array
-            Color[] pallet = new Color[uniqueColorSet.Count];
-            uniqueColorSet.CopyTo(pallet);
-
-            for (int lenMod = 1; lenMod < pallet.Length; lenMod++)
-            {
-                for (int i = 0; i < pallet.Length - lenMod; i++)
-                {
-                    if (pallet[i].GetBrightness() < pallet[i + 1].GetBrightness())
-                    {
-                        Color temp = pallet[i];
-                        pallet[i] = pallet[i + 1];
-                        pallet[i + 1] = temp;
-
+                        uniqueColors.Add(Color.FromArgb(a, r, g, b));
                     }
                 }
             }
-            return pallet;
+            finally
+            {
+                img.UnlockBits(bmpData);
+            }
+
+            // Convert HashSet to array
+            Color[] palette = uniqueColors.ToArray();
+
+            // Sort colors by brightness (descending)
+            Array.Sort(palette, (c1, c2) => c2.GetBrightness().CompareTo(c1.GetBrightness()));
+
+            return palette;
         }
 
-        static void DrawPixel(int[,] tMatrix, int[,] matrix, Point loc, List<Point> directions, bool est)
+
+        static void DrawPixel(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions, bool est)
         {
             int xpos = Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize);
             int ypos = Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize);
 
             Mouse.LeftDown(xpos, ypos, Time.MouseDownDelay, est);
             NeighborLineDraw(tMatrix, matrix, loc, directions, est);
-            matrix[loc.X, loc.Y] = 0;
+            matrix[loc.X, loc.Y] = false;
             Mouse.LeftUp(xpos, ypos, Time.MouseUpDelay, est);
         }
 
@@ -675,14 +711,14 @@ namespace RecRoomPainter
 
             Color[] pallet = ImageToPallet(DrawImage.Modified);
 
-            int[,] tMatrix = new int[DrawImage.Modified.Width, DrawImage.Modified.Height];
+            bool[,] tMatrix = new bool[DrawImage.Modified.Width, DrawImage.Modified.Height];
 
             // Initialize the 2D array with values filled with 0
             for (int i = 0; i < DrawImage.Modified.Width; i++)
             {
                 for (int j = 0; j < DrawImage.Modified.Height; j++)
                 {
-                    tMatrix[i, j] = 0;
+                    tMatrix[i, j] = false;
                 }
             }
 
@@ -695,16 +731,7 @@ namespace RecRoomPainter
 
                 if (c > 0)
                 {
-                    for (int i = 0; i < DrawImage.Modified.Width; i++)
-                    {
-                        for (int j = 0; j < DrawImage.Modified.Height; j++)
-                        {
-                            if (DrawImage.Modified.GetPixel(i, j) == pallet[c - 1])
-                            {
-                                tMatrix[i, j] = 1;
-                            }
-                        }
-                    }
+                    tMatrix = CoverageMatrix(DrawImage.Modified, pallet[c - 1], tMatrix);
                 }
 
                 if (c < Settings.SkipColors || pallet[c] == Color.FromArgb(255, 255, 0, 255))
@@ -714,22 +741,21 @@ namespace RecRoomPainter
 
                 List<int[]> pixelList = new List<int[]>(0);
 
-                int[,] cMatrix = new int[DrawImage.Modified.Width, DrawImage.Modified.Height];
+                bool[,] cMatrix = new bool[DrawImage.Modified.Width, DrawImage.Modified.Height];
 
                 if (Settings.FillFirstLayer && c == 0)
                 {
-                    // Initialize the 2D array with values filled with 1
                     for (int i = 0; i < DrawImage.Modified.Width; i++)
                     {
                         for (int j = 0; j < DrawImage.Modified.Height; j++)
                         {
-                            cMatrix[i, j] = 1;
+                            cMatrix[i, j] = true;
                         }
                     }
                 }
                 else
                 {
-                    cMatrix = CoverageMatrix(DrawImage.Modified, pallet[c]);
+                    cMatrix = CoverageMatrix(DrawImage.Modified, pallet[c], new bool[DrawImage.Modified.Width, DrawImage.Modified.Height]);
                 }
 
                 if (!est)
@@ -762,7 +788,7 @@ namespace RecRoomPainter
                         goto stopdrawing;
                     }
 
-                    if (cMatrix[coord.i2, coord.j2] >= 1)
+                    if (cMatrix[coord.i2, coord.j2])
                     {
                         int[] row = { coord.i2, coord.j2 };
                         pixelList.Add(row);
@@ -778,7 +804,7 @@ namespace RecRoomPainter
                         if (ModifierKeys == Keys.Alt)
                             return false;
                     }
-                    if (cMatrix[p[0], p[1]] >= 1)
+                    if (cMatrix[p[0], p[1]])
                     {
                         DrawPixel(tMatrix, cMatrix, new Point(p[0], p[1]), directions, est);
                     }
