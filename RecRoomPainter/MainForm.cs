@@ -22,6 +22,8 @@ namespace RecRoomPainter
 
     public partial class MainForm : Form
     {
+        private RunningProgressBar RunPBar;
+
         public static ScalingMode scaleType = ScalingMode.Box;
         public static ScalingMode processScaleType = ScalingMode.NearestNeighbor;
 
@@ -64,10 +66,11 @@ namespace RecRoomPainter
                 Pixelation = 1;
                 MaxColors = 16;
                 SkipColors = 0;
-                Depth = 3;
+                Depth = 0;
                 FillFirstLayer = false;
                 DitherPattern = 0;
                 QuantType = 0;
+                PenSize = 3;
                 RandomOrder = false;
                 VectorMode = false;
                 DirectDraw = false;
@@ -88,6 +91,7 @@ namespace RecRoomPainter
             public static bool FillFirstLayer { get; set; }
             public static int DitherPattern { get; set; }
             public static int QuantType { get; set; }
+            public static float PenSize { get; set; }
             public static bool VectorMode { get; set; }
             public static bool DirectDraw { get; set; }
             public static bool RandomOrder { get; set; }
@@ -333,7 +337,7 @@ namespace RecRoomPainter
                 progressBar1.Value = 50;
                 //DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, DrawImage.Original.Size, ScalingMode.NearestNeighbor);
                 DrawImage.Modified = CropImageSet(DrawImage.Modified);
-                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, new Size(Settings.DrawW, Settings.DrawH), ScalingMode.NearestNeighbor);
+                DrawImage.Modified = BitmapExtensions.Resize(DrawImage.Modified, new Size((int)Math.Round(Settings.DrawW / Settings.PenSize), (int)Math.Round(Settings.DrawH / Settings.PenSize)), ScalingMode.NearestNeighbor);
                 SetPreview();
 
                 progressBar1.Value = 100;
@@ -385,8 +389,8 @@ namespace RecRoomPainter
                 ActionQueue.LeftUp(x, y, 0);
             }
 
-            ActionQueue.RightDown(0, 0, 0);
-            ActionQueue.RightUp(0, 0, 0);
+            ActionQueue.RightDown(CCLocationX, CCLocationY, 0);
+            ActionQueue.RightUp(CCLocationX, CCLocationY, 0);
             FullLeftClick(CCLocationX, CCLocationY);
             FullLeftClick(HexCLocationX, HexCLocationY);
             ActionQueue.Sleep(Time.ColorChangeDelay);
@@ -490,6 +494,10 @@ namespace RecRoomPainter
                         step.Score++;
                         step.Location = startLocation;
                     }
+                    else if (Settings.DirectDraw)
+                    {
+                        break;
+                    }
 
                 }
                 return step;
@@ -589,14 +597,18 @@ namespace RecRoomPainter
                     Path.ClearPath(matrix, loc, path.Location);
 
                     loc = path.Location;
-                    ActionQueue.Move(Settings.DrawX + loc.X, Settings.DrawY + loc.Y, Time.MouseTurnDelay);
+                    ActionQueue.Move(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
+                               Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
+                               Time.MouseTurnDelay);
                 }
                 else
                 {
                     break;
                 }
             }
-            ActionQueue.LeftUp(Settings.DrawX + loc.X, Settings.DrawY + loc.Y, Time.MouseDownDelay);
+            ActionQueue.LeftUp(Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize),
+                         Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize),
+                         Time.MouseDownDelay);
         }
 
         private static Color[] ImageToPallet(Bitmap img)
@@ -645,8 +657,8 @@ namespace RecRoomPainter
 
         static void DrawPixel(bool[,] tMatrix, bool[,] matrix, Point loc, List<Point> directions)
         {
-            int xpos = Settings.DrawX + loc.X;
-            int ypos = Settings.DrawY + loc.Y;
+            int xpos = Settings.DrawX + (int)Math.Round(loc.X * Settings.PenSize);
+            int ypos = Settings.DrawY + (int)Math.Round(loc.Y * Settings.PenSize);
 
             ActionQueue.LeftDown(xpos, ypos, Time.MouseDownDelay);
             NeighborLineDraw(tMatrix, matrix, loc, directions);
@@ -759,23 +771,44 @@ namespace RecRoomPainter
         }
         public void RunQueue()
         {
+            int startLength = ActionQueue.AQueue.Count;
+            var drawingStartTime = DateTime.Now;
+            var drawingCurrentTime = DateTime.Now;
+
+            if (RunPBar == null || RunPBar.IsDisposed)
+            {
+                RunPBar = new RunningProgressBar();
+                RunPBar.UpdateProgress(0, startLength, 0);
+                RunPBar.Show();
+            }
+            Application.DoEvents();
+
             ActivateWindow("Rec Room");
             Thread.Sleep(1000);
 
             bool finished = true;
+            DateTime previousTime = DateTime.Now;
             while (ActionQueue.AQueue.Count > 0)
             {
+                if ((DateTime.Now - previousTime).TotalSeconds >= 1.0)
+                {
+                    drawingCurrentTime = DateTime.Now;
+                    Application.DoEvents();
+                    RunPBar.UpdateProgress(ActionQueue.AQueue.Count, startLength, (int)(drawingCurrentTime - drawingStartTime).TotalMilliseconds);
+                }
                 if (GetAsyncKeyState(0x12) < 0) // 0x12 is the virtual key code for Alt
                 {
                     Mouse.DrawClick(0x04, Cursor.Position.X, Cursor.Position.Y, 0);
-                    MessageBox.Show(new Form() { TopMost = true }, "Drawing stopped by user.\nALT key was pressed.", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    MessageBox.Show(new Form() { TopMost = true }, $"Drawing stopped by user.\nALT key was pressed.\n{ConvertMillisecondsToTimeFormat((int)(drawingCurrentTime - drawingStartTime).TotalMilliseconds)}", "Incomplete", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     finished = false;
                     break;
                 }
 
+
                 Action action = ActionQueue.AQueue.Dequeue();
                 action();
             }
+            RunPBar.Close();
 
             if (finished)
             {
@@ -898,7 +931,7 @@ namespace RecRoomPainter
         public void SetPreview()
         {
             DrawImage.Preview = (Bitmap)DrawImage.Modified.Clone();
-            pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Preview, new Size(DrawImage.Preview.Width, DrawImage.Preview.Height), scaleType, true);
+            pictureBox1.Image = BitmapExtensions.Resize(DrawImage.Preview, new Size((int)Math.Round(DrawImage.Preview.Width * Settings.PenSize), (int)Math.Round(DrawImage.Preview.Height * Settings.PenSize)), scaleType, true);
         }
 
         private void estButton_Click(object sender, EventArgs e)
